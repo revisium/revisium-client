@@ -40,6 +40,7 @@
     "dev": "tsdown --watch",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --testPathIgnorePatterns='integration'",
     "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern='integration' --runInBand",
+    "test:integration:cov": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern='integration' --runInBand --coverage --coverageDirectory=coverage-integration --silent",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:cov": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --silent --testPathIgnorePatterns='integration'",
     "test:integration:up": "docker compose -f docker-compose.tests.yml -p test-revisium-client up --wait -d",
