@@ -47,6 +47,7 @@ export default tseslint.config(
       'sonarjs/no-hardcoded-passwords': 'off',
       'sonarjs/no-clear-text-protocols': 'off',
       'sonarjs/no-nested-functions': 'off',
+      'sonarjs/no-skipped-tests': 'off',
       '@typescript-eslint/unbound-method': 'off',
     },
   },
