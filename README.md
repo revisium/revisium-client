@@ -7,7 +7,7 @@
 [![GitHub License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/revisium/revisium-client/blob/master/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/revisium/revisium-client)](https://github.com/revisium/revisium-client/releases)
 
-TypeScript HTTP client for [Revisium](https://revisium.io) REST API.
+Typed TypeScript client for [Revisium](https://revisium.io) REST API.
 
 </div>
 
@@ -17,60 +17,326 @@ TypeScript HTTP client for [Revisium](https://revisium.io) REST API.
 npm install @revisium/client
 ```
 
-## Usage
+## Quick Start
 
 ```typescript
 import { RevisiumClient } from '@revisium/client';
 
 const client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
 
-// Authenticate
-await client.login({ username: 'admin', password: 'admin' });
+// Login
+await client.login('admin', 'admin');
 
-// Set project context
-client.setProject({ organizationId: 'admin', projectName: 'my-project' });
+// Set context — resolves revisionId from branch
+await client.setContext({
+  organizationId: 'admin',
+  projectName: 'my-project',
+  branchName: 'master',   // default: 'master'
+  revision: 'draft',       // default: 'draft'
+});
 
-// Work with data
-const rows = await client.getRows('my-table', { first: 100 });
-await client.createRow('my-table', 'row-1', { name: 'Test' });
-await client.commit('Added test row');
+// Create table with schema
+await client.createTable('posts', {
+  type: 'object',
+  properties: {
+    title: { type: 'string', default: '' },
+    published: { type: 'boolean', default: false },
+  },
+  additionalProperties: false,
+  required: ['title', 'published'],
+});
+
+// Create row
+await client.createRow('posts', 'post-1', {
+  title: 'Hello World',
+  published: true,
+});
+
+// Read data
+const rows = await client.getRows('posts', { first: 100 });
+const row = await client.getRow('posts', 'post-1');
+
+// Commit changes
+await client.commit('Initial content');
+
+// Read committed data (head revision)
+await client.setContext({
+  organizationId: 'admin',
+  projectName: 'my-project',
+  revision: 'head',
+});
+const tables = await client.getTables();
 ```
 
 ## API
 
-### Connection
+### Authentication
 
-| Method | Description |
-|--------|-------------|
-| `login(credentials)` | Authenticate with username/password |
-| `loginWithToken(token)` | Authenticate with JWT token |
-| `setProject(options)` | Set organization, project, and branch context |
+```typescript
+await client.login('username', 'password');
+client.loginWithToken('jwt-token');
+client.isAuthenticated(); // boolean
+```
 
-### Data Operations
+### Context
 
-| Method | Description |
-|--------|-------------|
-| `getRows(tableId, options?)` | Get rows from a table |
-| `getRow(tableId, rowId)` | Get a single row |
-| `createRow(tableId, rowId, data)` | Create a new row |
-| `updateRow(tableId, rowId, data)` | Update a row |
-| `removeRow(tableId, rowId)` | Remove a row |
+```typescript
+await client.setContext({
+  organizationId: 'admin',
+  projectName: 'my-project',
+  branchName: 'master',      // default: 'master'
+  revision: 'draft',          // 'draft' | 'head' | '<revisionId>'
+});
 
-### Version Control
+client.organizationId;  // current org
+client.projectName;     // current project
+client.branchName;      // current branch
+client.revisionId;      // resolved revision ID
+client.isDraft;         // true if revision === 'draft'
+```
 
-| Method | Description |
-|--------|-------------|
-| `commit(comment?)` | Commit pending changes |
-| `rollback()` | Revert uncommitted changes |
-| `getChanges()` | Get pending changes summary |
+### Read Operations (any revision)
 
-### Schema
+```typescript
+await client.getTables({ first: 100, after: 'cursor' });
+await client.getTable('posts');
+await client.getTableSchema('posts');
+await client.getRows('posts', { first: 100 });
+await client.getRow('posts', 'post-1');
+await client.getChanges();
+```
 
-| Method | Description |
-|--------|-------------|
-| `getTables()` | List all tables |
-| `getTableSchema(tableId)` | Get table JSON Schema |
-| `createTable(tableId, schema)` | Create a new table |
+### Write Operations (draft only)
+
+Write methods throw if `revision` is not `'draft'`.
+
+```typescript
+// Tables
+await client.createTable('posts', schema);
+await client.updateTable('posts', patches);
+await client.deleteTable('posts');
+await client.renameTable('posts', 'articles');
+
+// Rows
+await client.createRow('posts', 'row-1', data);
+await client.createRows('posts', [{ rowId: 'r1', data }, { rowId: 'r2', data }]);
+await client.updateRow('posts', 'row-1', data);
+await client.updateRows('posts', [{ rowId: 'r1', data }]);
+await client.patchRow('posts', 'row-1', [{ op: 'replace', path: 'title', value: 'New' }]);
+await client.deleteRow('posts', 'row-1');
+await client.deleteRows('posts', ['row-1', 'row-2']);
+await client.renameRow('posts', 'row-1', 'post-1');
+```
+
+### Version Control (draft only)
+
+```typescript
+const revision = await client.commit('my changes');  // auto-refreshes draftRevisionId
+await client.revertChanges();                         // auto-refreshes draftRevisionId
+```
+
+## Error Handling
+
+`RevisiumClient` methods throw on errors instead of returning `{ data, error }`:
+
+```typescript
+// API errors (401, 403, 404, etc.)
+try {
+  await client.login('wrong', 'credentials');
+} catch (err) {
+  console.error(err.message); // "Unauthorized" or server error message
+}
+
+// Context not set
+try {
+  await client.getRows('posts');
+} catch (err) {
+  console.error(err.message); // "Context not set. Call setContext() first."
+}
+
+// Mutations in read-only revision
+await client.setContext({
+  organizationId: 'admin',
+  projectName: 'my-project',
+  revision: 'head', // or explicit revisionId
+});
+
+try {
+  await client.createRow('posts', 'row-1', { title: 'Hello' });
+} catch (err) {
+  console.error(err.message);
+  // "Mutations are only allowed in draft revision. Use setContext({ revision: "draft" })."
+}
+```
+
+## Low-Level SDK
+
+For advanced use cases, the auto-generated SDK functions are available:
+
+```typescript
+import { client, sdk } from '@revisium/client';
+
+client.setConfig({ baseUrl: 'http://localhost:8080' });
+
+const { data, error } = await sdk.login({
+  body: { emailOrUsername: 'admin', password: 'admin' },
+});
+
+if (error) {
+  console.error(error.statusCode, error.message);
+} else {
+  client.setConfig({ auth: data.accessToken });
+}
+```
+
+### Custom Client Instance
+
+```typescript
+import { createClient, createConfig, sdk } from '@revisium/client';
+
+const myClient = createClient(createConfig({
+  baseUrl: 'https://my-revisium.example.com',
+  auth: 'my-token',
+}));
+
+const result = await sdk.projects({
+  client: myClient,
+  path: { organizationId: 'admin' },
+  query: { first: 100 },
+});
+```
+
+## Available Low-Level Functions
+
+### Auth
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `login` | POST | Authenticate and get access token |
+| `me` | GET | Get current user |
+| `createUser` | POST | Create user (admin) |
+| `updatePassword` | PUT | Update password |
+
+### Projects
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `projects` | GET | List projects |
+| `project` | GET | Get project by name |
+| `createProject` | POST | Create project |
+| `updateProject` | PUT | Update project settings |
+| `deleteProject` | DELETE | Delete project |
+
+### Branches
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `rootBranch` | GET | Get root branch |
+| `branches` | GET | List branches |
+| `branch` | GET | Get branch by name |
+| `branchTouched` | GET | Check for uncommitted changes |
+| `createBranch` | POST | Create branch from revision |
+| `deleteBranch` | DELETE | Delete branch |
+| `parentBranch` | GET | Get parent branch |
+| `childBranches` | GET | List child branches |
+
+### Revisions
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `draftRevision` | GET | Get draft (working) revision |
+| `headRevision` | GET | Get latest committed revision |
+| `startRevision` | GET | Get first revision |
+| `revision` | GET | Get revision by ID |
+| `revisions` | GET | List revisions |
+| `createRevision` | POST | Commit changes |
+| `revertChanges` | POST | Revert uncommitted changes |
+| `parentRevision` | GET | Get parent revision |
+| `childRevision` | GET | Get child revision |
+
+### Tables
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `tables` | GET | List tables |
+| `table` | GET | Get table by ID |
+| `tableSchema` | GET | Get table JSON Schema |
+| `createTable` | POST | Create table |
+| `updateTable` | PATCH | Update table schema (JSON Patch) |
+| `renameTable` | PATCH | Rename table |
+| `deleteTable` | DELETE | Delete table |
+| `tableCountRows` | GET | Count rows in table |
+
+### Rows
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `rows` | POST | Query rows (with filters) |
+| `row` | GET | Get row by ID |
+| `createRow` | POST | Create row |
+| `createRows` | POST | Bulk create rows |
+| `updateRow` | PUT | Update row data |
+| `updateRows` | PUT | Bulk update rows |
+| `patchRow` | PATCH | Patch row (JSON Patch) |
+| `patchRows` | PATCH | Bulk patch rows |
+| `renameRow` | PATCH | Rename row |
+| `deleteRow` | DELETE | Delete row |
+| `deleteRows` | DELETE | Bulk delete rows |
+
+### Changes
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `revisionChanges` | GET | Get revision changes summary |
+| `tableChanges` | GET | Get table-level changes |
+| `rowChanges` | GET | Get row-level changes |
+
+### Migrations, Endpoints, Foreign Keys
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `migrations` | GET | Get migrations |
+| `applyMigrations` | POST | Apply migrations |
+| `endpoints` | GET | List endpoints |
+| `createEndpoint` | POST | Create endpoint |
+| `deleteEndpoint` | DELETE | Delete endpoint |
+| `endpointRelatives` | GET | Get endpoint relatives |
+| `tableForeignKeysBy` | GET | Foreign keys from table |
+| `tableForeignKeysTo` | GET | Foreign keys to table |
+| `rowForeignKeysBy` | GET | Foreign keys from row |
+| `rowForeignKeysTo` | GET | Foreign keys to row |
+| `uploadFile` | POST | Upload file |
+
+### System
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `getConfiguration` | GET | Get server configuration |
+| `liveness` | GET | Liveness probe |
+| `readiness` | GET | Readiness probe |
+
+### Organization & Users
+
+| Function | Method | Description |
+|----------|--------|-------------|
+| `usersOrganization` | GET | List organization users |
+| `addUserToOrganization` | POST | Add user to organization |
+| `removeUserFromOrganization` | DELETE | Remove user from organization |
+| `usersProject` | GET | List project users |
+| `addUserToProject` | POST | Add user to project |
+| `removeUserFromProject` | DELETE | Remove user from project |
+
+## Development
+
+```bash
+npm run generate          # Regenerate client from OpenAPI spec
+npm run generate:download # Download spec and regenerate
+npm run tsc               # TypeScript check
+npm run lint:ci           # Lint
+npm test                  # Unit tests
+npm run test:integration  # Integration tests (requires running Revisium)
+npm run build             # Build
+```
 
 ## License
 

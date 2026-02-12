@@ -13,6 +13,8 @@ export default tseslint.config(
       'coverage/**',
       'jest.config.js',
       'tsdown.config.ts',
+      'openapi-ts.config.ts',
+      'src/generated/**',
     ],
   },
   eslint.configs.recommended,
