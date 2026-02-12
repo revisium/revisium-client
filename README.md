@@ -24,9 +24,6 @@ import { RevisiumClient } from '@revisium/client';
 
 const client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
 
-// Login
-await client.login('admin', 'admin');
-
 // Set context — resolves revisionId from branch
 await client.setContext({
   organizationId: 'admin',
@@ -70,11 +67,15 @@ const tables = await client.getTables();
 
 ## API
 
-### Authentication
+### Authentication (optional)
+
+Authentication is not required when the server runs in no-auth mode. If auth is enabled:
 
 ```typescript
 await client.login('username', 'password');
+// or
 client.loginWithToken('jwt-token');
+
 client.isAuthenticated(); // boolean
 ```
 
@@ -140,13 +141,6 @@ await client.revertChanges();                         // auto-refreshes draftRev
 `RevisiumClient` methods throw on errors instead of returning `{ data, error }`:
 
 ```typescript
-// API errors (401, 403, 404, etc.)
-try {
-  await client.login('wrong', 'credentials');
-} catch (err) {
-  console.error(err.message); // "Unauthorized" or server error message
-}
-
 // Context not set
 try {
   await client.getRows('posts');
