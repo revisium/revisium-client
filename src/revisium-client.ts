@@ -4,7 +4,7 @@ export interface RevisiumClientOptions {
 
 export class RevisiumClient {
   private readonly _baseUrl: string;
-  private _token: string | null = null;
+  private readonly _token: string | null = null;
 
   constructor(options: RevisiumClientOptions) {
     const url = options.baseUrl;
