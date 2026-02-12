@@ -32,8 +32,23 @@ jobs:
       - name: Compile TypeScript
         run: npm run tsc
 
-      - name: Run tests with coverage
+      - name: Run unit tests with coverage
         run: npm run test:cov
+
+      - name: Start Revisium
+        run: npm run test:integration:up
+
+      - name: Wait for Revisium to be ready
+        run: npx wait-on http://localhost:9000/api/health/liveness --timeout 60000
+
+      - name: Run integration tests with coverage
+        run: npm run test:integration:cov
+        env:
+          REVISIUM_URL: http://localhost:9000
+
+      - name: Stop Revisium
+        if: always()
+        run: npm run test:integration:down
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@8c71dc039c2dd71d3821e89a2b58ecc7fee6ced9

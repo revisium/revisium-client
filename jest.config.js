@@ -20,6 +20,7 @@ export default {
     '!src/**/*.spec.ts',
     '!src/**/*.test.ts',
     '!src/index.ts',
+    '!src/generated/**',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
