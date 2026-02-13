@@ -377,6 +377,7 @@ describe('RevisiumClient Integration', () => {
   it('getChanges after commit', async () => {
     const changes = await rc.getChanges();
     expect(changes).toBeDefined();
+    expect(changes.totalChanges).toBe(0);
   });
 
   it('commit twice — modify after commit and commit again', async () => {
