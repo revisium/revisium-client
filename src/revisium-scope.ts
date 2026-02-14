@@ -44,7 +44,7 @@ export class RevisiumScope {
   private readonly _revisionMode: 'draft' | 'head' | 'explicit';
   private readonly _owner: ScopeOwner;
   private _revisionId: string;
-  private _isDraft: boolean;
+  private readonly _isDraft: boolean;
   private _stale = false;
   private _disposed = false;
   private _refreshPromise: Promise<string> | null = null;
@@ -134,20 +134,18 @@ export class RevisiumScope {
   private async getRevisionId(): Promise<string> {
     this.assertNotDisposed();
     if (this._stale) {
-      if (!this._refreshPromise) {
-        this._refreshPromise = this.fetchRevisionId().then(
-          (id) => {
-            this._revisionId = id;
-            this._stale = false;
-            this._refreshPromise = null;
-            return id;
-          },
-          (err) => {
-            this._refreshPromise = null;
-            throw err;
-          },
-        );
-      }
+      this._refreshPromise ??= this.fetchRevisionId().then(
+        (id) => {
+          this._revisionId = id;
+          this._stale = false;
+          this._refreshPromise = null;
+          return id;
+        },
+        (err) => {
+          this._refreshPromise = null;
+          throw err;
+        },
+      );
       return this._refreshPromise;
     }
     return this._revisionId;
