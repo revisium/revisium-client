@@ -43,8 +43,8 @@
     "test:integration:cov": "NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern='integration' --runInBand --coverage --coverageDirectory=coverage-integration --silent",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:cov": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --silent --testPathIgnorePatterns='integration'",
-    "test:integration:up": "docker compose -f docker-compose.tests.yml -p test-revisium-client up --wait -d",
-    "test:integration:down": "docker compose -f docker-compose.tests.yml -p test-revisium-client down -v",
+    "test:integration:up": "npx @revisium/standalone --auth --port 9000 --data .revisium-test & echo $! > .revisium-test.pid",
+    "test:integration:down": "if [ -f .revisium-test.pid ]; then kill $(cat .revisium-test.pid) 2>/dev/null; rm -f .revisium-test.pid; fi; rm -rf .revisium-test",
     "lint:ci": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -58,6 +58,7 @@
     "@eslint/js": "^9.15.0",
     "@hey-api/openapi-ts": "^0.92.3",
     "@jest/globals": "^29.7.0",
+    "@revisium/standalone": "2.6.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^24.10.7",
     "eslint": "^9.15.0",
@@ -74,6 +75,10 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "overrides": {
+    "hono": "4.11.9",
+    "lodash": "4.17.23"
   },
   "publishConfig": {
     "access": "public"

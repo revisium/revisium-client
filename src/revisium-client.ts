@@ -23,6 +23,10 @@ import type {
   UpdateRowsResponse,
   UpdateTableResponse,
 } from './generated/types.gen.js';
+import * as ops from './data-operations.js';
+import type { ScopeContext, BranchContext } from './data-operations.js';
+import { RevisiumScope } from './revisium-scope.js';
+import type { WithContextOptions } from './revisium-scope.js';
 
 export interface RevisiumClientOptions {
   baseUrl: string;
@@ -35,7 +39,12 @@ export interface SetContextOptions {
   revision?: string;
 }
 
-export class RevisiumClient {
+export interface ScopeOwner {
+  notifyBranchChanged(branchKey: string, excludeScope?: RevisiumScope): void;
+  unregisterScope(scope: RevisiumScope): void;
+}
+
+export class RevisiumClient implements ScopeOwner {
   private readonly _client: Client;
   private readonly _baseUrl: string;
   private _organizationId: string | null = null;
@@ -44,6 +53,7 @@ export class RevisiumClient {
   private _revisionId: string | null = null;
   private _isDraft = false;
   private _isAuthenticated = false;
+  private readonly _scopes = new Map<string, Set<RevisiumScope>>();
 
   constructor(options: RevisiumClientOptions) {
     const url = options.baseUrl;
@@ -88,7 +98,7 @@ export class RevisiumClient {
       client: this._client,
       body: { emailOrUsername: username, password },
     });
-    const data = this.unwrap(result);
+    const data = ops.unwrap(result);
     this._client.setConfig({ auth: data.accessToken });
     this._isAuthenticated = true;
   }
@@ -110,148 +120,163 @@ export class RevisiumClient {
     this._projectName = projectName;
     this._branchName = branchName;
 
-    const branchPath = { organizationId, projectName, branchName };
+    const branch: BranchContext = { organizationId, projectName, branchName };
 
     if (revision === 'draft') {
-      const result = await sdk.draftRevision({
-        client: this._client,
-        path: branchPath,
-      });
-      const data = this.unwrap(result);
-      this._revisionId = data.id;
+      this._revisionId = await ops.fetchDraftRevisionId(this._client, branch);
       this._isDraft = true;
     } else if (revision === 'head') {
-      const result = await sdk.headRevision({
-        client: this._client,
-        path: branchPath,
-      });
-      const data = this.unwrap(result);
-      this._revisionId = data.id;
+      this._revisionId = await ops.fetchHeadRevisionId(this._client, branch);
       this._isDraft = false;
     } else {
-      const result = await sdk.revision({
-        client: this._client,
-        path: { revisionId: revision },
-      });
-      this.unwrap(result);
+      await ops.validateRevisionId(this._client, revision);
       this._revisionId = revision;
       this._isDraft = false;
     }
+  }
+
+  async withContext(options: WithContextOptions): Promise<RevisiumScope> {
+    const {
+      organizationId,
+      projectName,
+      branchName = 'master',
+      revision = 'draft',
+    } = options;
+
+    const branch: BranchContext = { organizationId, projectName, branchName };
+    let revisionId: string;
+    let isDraft: boolean;
+    let revisionMode: 'draft' | 'head' | 'explicit';
+
+    if (revision === 'draft') {
+      revisionId = await ops.fetchDraftRevisionId(this._client, branch);
+      isDraft = true;
+      revisionMode = 'draft';
+    } else if (revision === 'head') {
+      revisionId = await ops.fetchHeadRevisionId(this._client, branch);
+      isDraft = false;
+      revisionMode = 'head';
+    } else {
+      await ops.validateRevisionId(this._client, revision);
+      revisionId = revision;
+      isDraft = false;
+      revisionMode = 'explicit';
+    }
+
+    const scope = new RevisiumScope({
+      client: this._client,
+      branch,
+      revisionId,
+      isDraft,
+      revisionMode,
+      owner: this,
+    });
+
+    const branchKey = `${organizationId}/${projectName}/${branchName}`;
+    let scopeSet = this._scopes.get(branchKey);
+    if (!scopeSet) {
+      scopeSet = new Set();
+      this._scopes.set(branchKey, scopeSet);
+    }
+    scopeSet.add(scope);
+
+    return scope;
+  }
+
+  notifyBranchChanged(branchKey: string, excludeScope?: RevisiumScope): void {
+    const scopeSet = this._scopes.get(branchKey);
+    if (!scopeSet) {
+      return;
+    }
+    for (const scope of scopeSet) {
+      if (scope !== excludeScope) {
+        scope.markStale();
+      }
+    }
+  }
+
+  unregisterScope(scope: RevisiumScope): void {
+    for (const [key, scopeSet] of this._scopes) {
+      scopeSet.delete(scope);
+      if (scopeSet.size === 0) {
+        this._scopes.delete(key);
+      }
+    }
+  }
+
+  private get _scopeContext(): ScopeContext {
+    return {
+      client: this._client,
+      branch: {
+        organizationId: this._organizationId ?? '',
+        projectName: this._projectName ?? '',
+        branchName: this._branchName ?? '',
+      },
+      isDraft: this._isDraft,
+      getRevisionId: () => {
+        if (this._revisionId === null) {
+          return Promise.reject(
+            new Error('Context not set. Call setContext() first.'),
+          );
+        }
+        return Promise.resolve(this._revisionId);
+      },
+    };
   }
 
   async getTables(options?: {
     first?: number;
     after?: string;
   }): Promise<TablesConnection> {
-    this.assertContext();
-    const result = await sdk.tables({
-      client: this._client,
-      path: { revisionId: this._revisionId! },
-      query: { first: options?.first ?? 100, after: options?.after },
-    });
-    return this.unwrap(result);
+    return ops.getTables(this._scopeContext, options);
   }
 
   async getTable(tableId: string): Promise<TableModel> {
-    this.assertContext();
-    const result = await sdk.table({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-    });
-    return this.unwrap(result);
+    return ops.getTable(this._scopeContext, tableId);
   }
 
   async getTableSchema(tableId: string): Promise<object> {
-    this.assertContext();
-    const result = await sdk.tableSchema({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-    });
-    return this.unwrap(result);
+    return ops.getTableSchema(this._scopeContext, tableId);
   }
 
   async getRows(
     tableId: string,
     options?: GetTableRowsDto,
   ): Promise<RowsConnection> {
-    this.assertContext();
-    const result = await sdk.rows({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: options ?? { first: 100 },
-    });
-    return this.unwrap(result);
+    return ops.getRows(this._scopeContext, tableId, options);
   }
 
   async getRow(tableId: string, rowId: string): Promise<RowModel> {
-    this.assertContext();
-    const result = await sdk.row({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId, rowId },
-    });
-    return this.unwrap(result);
+    return ops.getRow(this._scopeContext, tableId, rowId);
   }
 
   async getChanges(): Promise<RevisionChangesResponse> {
-    this.assertContext();
-    const result = await sdk.revisionChanges({
-      client: this._client,
-      path: { revisionId: this._revisionId! },
-    });
-    return this.unwrap(result);
+    return ops.getChanges(this._scopeContext);
   }
 
   async createTable(
     tableId: string,
     schema: object,
   ): Promise<CreateTableResponse> {
-    this.assertDraft();
-    const result = await sdk.createTable({
-      client: this._client,
-      path: { revisionId: this._revisionId! },
-      body: {
-        tableId,
-        schema: schema as { [key: string]: unknown },
-      },
-    });
-    return this.unwrap(result);
+    return ops.createTable(this._scopeContext, tableId, schema);
   }
 
   async updateTable(
     tableId: string,
     patches: object[],
   ): Promise<UpdateTableResponse> {
-    this.assertDraft();
-    const result = await sdk.updateTable({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: {
-        patches: patches as Array<{ [key: string]: unknown }>,
-      },
-    });
-    return this.unwrap(result);
+    return ops.updateTable(this._scopeContext, tableId, patches);
   }
 
   async deleteTable(tableId: string): Promise<void> {
-    this.assertDraft();
-    const result = await sdk.deleteTable({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-    });
-    this.unwrap(result);
+    return ops.deleteTable(this._scopeContext, tableId);
   }
 
   async renameTable(
     tableId: string,
     nextTableId: string,
   ): Promise<RenameTableResponse> {
-    this.assertDraft();
-    const result = await sdk.renameTable({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: { nextTableId },
-    });
-    return this.unwrap(result);
+    return ops.renameTable(this._scopeContext, tableId, nextTableId);
   }
 
   async createRow(
@@ -259,31 +284,14 @@ export class RevisiumClient {
     rowId: string,
     data: object,
   ): Promise<CreateRowResponse> {
-    this.assertDraft();
-    const result = await sdk.createRow({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: { rowId, data: data as { [key: string]: unknown } },
-    });
-    return this.unwrap(result);
+    return ops.createRow(this._scopeContext, tableId, rowId, data);
   }
 
   async createRows(
     tableId: string,
     rows: Array<{ rowId: string; data: object }>,
   ): Promise<CreateRowsResponse> {
-    this.assertDraft();
-    const result = await sdk.createRows({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: {
-        rows: rows.map((r) => ({
-          rowId: r.rowId,
-          data: r.data as { [key: string]: unknown },
-        })),
-      },
-    });
-    return this.unwrap(result);
+    return ops.createRows(this._scopeContext, tableId, rows);
   }
 
   async updateRow(
@@ -291,31 +299,14 @@ export class RevisiumClient {
     rowId: string,
     data: object,
   ): Promise<UpdateRowResponse> {
-    this.assertDraft();
-    const result = await sdk.updateRow({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId, rowId },
-      body: { data: data as { [key: string]: unknown } },
-    });
-    return this.unwrap(result);
+    return ops.updateRow(this._scopeContext, tableId, rowId, data);
   }
 
   async updateRows(
     tableId: string,
     rows: Array<{ rowId: string; data: object }>,
   ): Promise<UpdateRowsResponse> {
-    this.assertDraft();
-    const result = await sdk.updateRows({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: {
-        rows: rows.map((r) => ({
-          rowId: r.rowId,
-          data: r.data as { [key: string]: unknown },
-        })),
-      },
-    });
-    return this.unwrap(result);
+    return ops.updateRows(this._scopeContext, tableId, rows);
   }
 
   async patchRow(
@@ -323,32 +314,15 @@ export class RevisiumClient {
     rowId: string,
     patches: PatchRow[],
   ): Promise<PatchRowResponse> {
-    this.assertDraft();
-    const result = await sdk.patchRow({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId, rowId },
-      body: { patches },
-    });
-    return this.unwrap(result);
+    return ops.patchRow(this._scopeContext, tableId, rowId, patches);
   }
 
   async deleteRow(tableId: string, rowId: string): Promise<void> {
-    this.assertDraft();
-    const result = await sdk.deleteRow({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId, rowId },
-    });
-    this.unwrap(result);
+    return ops.deleteRow(this._scopeContext, tableId, rowId);
   }
 
   async deleteRows(tableId: string, rowIds: string[]): Promise<void> {
-    this.assertDraft();
-    const result = await sdk.deleteRows({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId },
-      body: { rowIds },
-    });
-    this.unwrap(result);
+    return ops.deleteRows(this._scopeContext, tableId, rowIds);
   }
 
   async renameRow(
@@ -356,79 +330,34 @@ export class RevisiumClient {
     rowId: string,
     nextRowId: string,
   ): Promise<RenameRowResponse> {
-    this.assertDraft();
-    const result = await sdk.renameRow({
-      client: this._client,
-      path: { revisionId: this._revisionId!, tableId, rowId },
-      body: { nextRowId },
-    });
-    return this.unwrap(result);
+    return ops.renameRow(this._scopeContext, tableId, rowId, nextRowId);
   }
 
   async commit(comment?: string): Promise<RevisionModel> {
-    this.assertDraft();
-    const result = await sdk.createRevision({
-      client: this._client,
-      path: {
-        organizationId: this._organizationId!,
-        projectName: this._projectName!,
-        branchName: this._branchName!,
-      },
-      body: { comment },
-    });
-    const data = this.unwrap(result);
+    const data = await ops.commit(this._scopeContext, comment);
     await this.refreshDraftRevisionId();
+    this.notifyScopesOnCurrentBranch();
     return data;
   }
 
   async revertChanges(): Promise<void> {
-    this.assertDraft();
-    await sdk.revertChanges({
-      client: this._client,
-      path: {
-        organizationId: this._organizationId!,
-        projectName: this._projectName!,
-        branchName: this._branchName!,
-      },
-    });
+    await ops.revertChanges(this._scopeContext);
     await this.refreshDraftRevisionId();
-  }
-
-  private assertDraft(): void {
-    this.assertContext();
-    if (!this._isDraft) {
-      throw new Error(
-        'Mutations are only allowed in draft revision. Use setContext({ revision: "draft" }).',
-      );
-    }
-  }
-
-  private assertContext(): void {
-    if (this._revisionId === null) {
-      throw new Error('Context not set. Call setContext() first.');
-    }
+    this.notifyScopesOnCurrentBranch();
   }
 
   private async refreshDraftRevisionId(): Promise<void> {
-    const result = await sdk.draftRevision({
-      client: this._client,
-      path: {
-        organizationId: this._organizationId!,
-        projectName: this._projectName!,
-        branchName: this._branchName!,
-      },
+    this._revisionId = await ops.fetchDraftRevisionId(this._client, {
+      organizationId: this._organizationId!,
+      projectName: this._projectName!,
+      branchName: this._branchName!,
     });
-    const data = this.unwrap(result);
-    this._revisionId = data.id;
   }
 
-  private unwrap<T>(result: { data?: T; error?: unknown }): T {
-    if (result.error) {
-      const err = result.error as { statusCode?: number; message?: string };
-      throw new Error(
-        err.message ?? `API error: ${JSON.stringify(result.error)}`,
-      );
+  private notifyScopesOnCurrentBranch(): void {
+    if (this._organizationId && this._projectName && this._branchName) {
+      const branchKey = `${this._organizationId}/${this._projectName}/${this._branchName}`;
+      this.notifyBranchChanged(branchKey);
     }
-    return result.data as T;
   }
 }

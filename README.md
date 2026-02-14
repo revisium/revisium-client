@@ -136,6 +136,82 @@ const revision = await client.commit('my changes');  // auto-refreshes draftRevi
 await client.revertChanges();                         // auto-refreshes draftRevisionId
 ```
 
+### Isolated Scopes (`withContext`)
+
+Use `withContext()` to create isolated scopes that share authentication but have independent context. Useful for multi-context scenarios (e.g., handling parallel requests in a server).
+
+```typescript
+const client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
+await client.login('admin', 'admin');
+
+// Create isolated scopes — each has its own revisionId
+const scopeA = await client.withContext({
+  organizationId: 'admin',
+  projectName: 'project-a',
+  revision: 'draft',
+});
+
+const scopeB = await client.withContext({
+  organizationId: 'admin',
+  projectName: 'project-b',
+  revision: 'draft',
+});
+
+// Scopes work independently
+await scopeA.createRow('posts', 'row-1', { title: 'Hello' });
+await scopeB.getTables();
+
+// Commit in one scope marks sibling scopes (same branch) as stale
+const scopeC = await client.withContext({
+  organizationId: 'admin',
+  projectName: 'project-a',
+  revision: 'draft',
+});
+
+await scopeA.commit('changes');
+// scopeC.isStale === true — auto-refreshes on next data access
+
+// Dispose when done to clean up tracking
+scopeA.dispose();
+scopeB.dispose();
+scopeC.dispose();
+```
+
+#### Scope Properties
+
+```typescript
+scope.organizationId;  // string
+scope.projectName;     // string
+scope.branchName;      // string
+scope.revisionId;      // string — current cached revisionId
+scope.isDraft;         // boolean
+scope.isStale;         // boolean — true if sibling committed
+scope.isDisposed;      // boolean
+scope.client;          // underlying HTTP client (shared with parent)
+```
+
+#### Scope Methods
+
+```typescript
+// Same data methods as RevisiumClient
+await scope.getTables();
+await scope.createRow('posts', 'row-1', data);
+await scope.commit('message');
+// ... all other read/write/version-control methods
+
+// Scope-specific
+scope.markStale();      // manually mark as stale
+await scope.refresh();  // manually refresh revisionId
+scope.dispose();        // unregister from parent tracking
+```
+
+#### Stale Behavior
+
+- When one scope commits or reverts, all sibling scopes on the same branch are marked stale
+- Stale scopes auto-refresh their `revisionId` on the next data method call
+- Scopes with explicit `revisionId` (not `'draft'` or `'head'`) never go stale
+- Concurrent reads on a stale scope share a single refresh API call (promise dedup)
+
 ## Error Handling
 
 `RevisiumClient` methods throw on errors instead of returning `{ data, error }`:

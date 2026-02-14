@@ -2,7 +2,10 @@ node_modules
 .idea/
 dist
 coverage
+coverage-integration
 *.log
 .env
 .DS_Store
 *.tsbuildinfo
+.revisium-test
+.revisium-test.pid

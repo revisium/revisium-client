@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -36,10 +36,23 @@ jobs:
         run: npm run test:cov
 
       - name: Start Revisium
-        run: npm run test:integration:up
+        run: |
+          npx @revisium/standalone --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
+          echo $! > revisium.pid
+          echo "Started with PID $(cat revisium.pid)"
 
       - name: Wait for Revisium to be ready
-        run: npx wait-on http://localhost:9000/api/health/liveness --timeout 60000
+        run: |
+          for i in $(seq 1 300); do
+            if curl -sf http://localhost:9000/health/readiness > /dev/null 2>&1; then
+              echo "Ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Timed out waiting for Revisium"
+          cat revisium.log
+          exit 1
 
       - name: Run integration tests with coverage
         run: npm run test:integration:cov
@@ -48,7 +61,16 @@ jobs:
 
       - name: Stop Revisium
         if: always()
-        run: npm run test:integration:down
+        run: |
+          if [ -f revisium.pid ]; then
+            kill $(cat revisium.pid) 2>/dev/null || true
+            rm -f revisium.pid
+          fi
+          rm -rf .revisium-test
+
+      - name: Show Revisium logs on failure
+        if: failure()
+        run: cat revisium.log 2>/dev/null || true
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@8c71dc039c2dd71d3821e89a2b58ecc7fee6ced9
