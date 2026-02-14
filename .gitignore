@@ -8,3 +8,4 @@ coverage-integration
 .DS_Store
 *.tsbuildinfo
 .revisium-test
+.revisium-test.pid

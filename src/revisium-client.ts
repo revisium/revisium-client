@@ -40,7 +40,7 @@ export interface SetContextOptions {
 }
 
 export interface ScopeOwner {
-  notifyBranchChanged(branchKey: string, excludeScope: RevisiumScope): void;
+  notifyBranchChanged(branchKey: string, excludeScope?: RevisiumScope): void;
   unregisterScope(scope: RevisiumScope): void;
 }
 
@@ -183,7 +183,7 @@ export class RevisiumClient implements ScopeOwner {
     return scope;
   }
 
-  notifyBranchChanged(branchKey: string, excludeScope: RevisiumScope): void {
+  notifyBranchChanged(branchKey: string, excludeScope?: RevisiumScope): void {
     const scopeSet = this._scopes.get(branchKey);
     if (!scopeSet) {
       return;
@@ -336,12 +336,14 @@ export class RevisiumClient implements ScopeOwner {
   async commit(comment?: string): Promise<RevisionModel> {
     const data = await ops.commit(this._scopeContext, comment);
     await this.refreshDraftRevisionId();
+    this.notifyScopesOnCurrentBranch();
     return data;
   }
 
   async revertChanges(): Promise<void> {
     await ops.revertChanges(this._scopeContext);
     await this.refreshDraftRevisionId();
+    this.notifyScopesOnCurrentBranch();
   }
 
   private async refreshDraftRevisionId(): Promise<void> {
@@ -350,5 +352,12 @@ export class RevisiumClient implements ScopeOwner {
       projectName: this._projectName!,
       branchName: this._branchName!,
     });
+  }
+
+  private notifyScopesOnCurrentBranch(): void {
+    if (this._organizationId && this._projectName && this._branchName) {
+      const branchKey = `${this._organizationId}/${this._projectName}/${this._branchName}`;
+      this.notifyBranchChanged(branchKey);
+    }
   }
 }

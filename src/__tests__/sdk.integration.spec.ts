@@ -752,10 +752,7 @@ describe('RevisiumScope Integration', () => {
       revision: 'draft',
     });
 
-    await scopeA.createRow('items', 'refresh-test', {
-      title: 'Refresh',
-      count: 0,
-    });
+    await scopeA.createTable('stale-test', tableSchema);
     await scopeA.commit('trigger stale');
 
     expect(scopeB.isStale).toBe(true);
@@ -787,10 +784,7 @@ describe('RevisiumScope Integration', () => {
       revision: headScope.revisionId,
     });
 
-    await draftScope.createRow('items', 'explicit-test-row', {
-      title: 'Explicit',
-      count: 0,
-    });
+    await draftScope.createTable('explicit-test', tableSchema);
     await draftScope.commit('explicit test');
 
     expect(headScope.isStale).toBe(true);
