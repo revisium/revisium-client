@@ -35,6 +35,10 @@ export type CreateUserDto = {
     email?: string;
 };
 
+export type SuccessModelDto = {
+    success: boolean;
+};
+
 export type UpdatePasswordDto = {
     oldPassword: string;
     newPassword: string;
@@ -206,10 +210,6 @@ export type BranchesConnection = {
      * Pagination metadata
      */
     pageInfo: PageInfo;
-};
-
-export type SuccessModelDto = {
-    success: boolean;
 };
 
 export type UpdateProjectDto = {
@@ -657,6 +657,10 @@ export type ApplyMigrationsResponseDto = {
      * Error message if the migration failed
      */
     error?: string;
+};
+
+export type CountModelDto = {
+    count: number;
 };
 
 export type OrderByDto = {
@@ -1117,6 +1121,7 @@ export type GithubOauth = {
 
 export type ConfigurationResponse = {
     availableEmailSignUp: boolean;
+    noAuth: boolean;
     google: GoogleOauth;
     github: GithubOauth;
 };
@@ -1176,7 +1181,7 @@ export type CreateUserErrors = {
 export type CreateUserError = CreateUserErrors[keyof CreateUserErrors];
 
 export type CreateUserResponses = {
-    200: boolean;
+    200: SuccessModelDto;
 };
 
 export type CreateUserResponse = CreateUserResponses[keyof CreateUserResponses];
@@ -1206,7 +1211,7 @@ export type UpdatePasswordErrors = {
 export type UpdatePasswordError = UpdatePasswordErrors[keyof UpdatePasswordErrors];
 
 export type UpdatePasswordResponses = {
-    200: boolean;
+    200: SuccessModelDto;
 };
 
 export type UpdatePasswordResponse = UpdatePasswordResponses[keyof UpdatePasswordResponses];
@@ -1361,7 +1366,7 @@ export type RemoveUserFromOrganizationErrors = {
 export type RemoveUserFromOrganizationError = RemoveUserFromOrganizationErrors[keyof RemoveUserFromOrganizationErrors];
 
 export type RemoveUserFromOrganizationResponses = {
-    200: boolean;
+    200: SuccessModelDto;
 };
 
 export type RemoveUserFromOrganizationResponse = RemoveUserFromOrganizationResponses[keyof RemoveUserFromOrganizationResponses];
@@ -1442,7 +1447,7 @@ export type AddUserToOrganizationErrors = {
 export type AddUserToOrganizationError = AddUserToOrganizationErrors[keyof AddUserToOrganizationErrors];
 
 export type AddUserToOrganizationResponses = {
-    200: boolean;
+    200: SuccessModelDto;
 };
 
 export type AddUserToOrganizationResponse = AddUserToOrganizationResponses[keyof AddUserToOrganizationResponses];
@@ -1843,7 +1848,7 @@ export type DeleteBranchErrors = {
 export type DeleteBranchError = DeleteBranchErrors[keyof DeleteBranchErrors];
 
 export type DeleteBranchResponses = {
-    200: boolean;
+    200: SuccessModelDto;
 };
 
 export type DeleteBranchResponse = DeleteBranchResponses[keyof DeleteBranchResponses];
@@ -3021,7 +3026,7 @@ export type TableCountRowsErrors = {
 export type TableCountRowsError = TableCountRowsErrors[keyof TableCountRowsErrors];
 
 export type TableCountRowsResponses = {
-    200: number;
+    200: CountModelDto;
 };
 
 export type TableCountRowsResponse = TableCountRowsResponses[keyof TableCountRowsResponses];
@@ -3370,7 +3375,7 @@ export type TableCountForeignKeysByErrors = {
 export type TableCountForeignKeysByError = TableCountForeignKeysByErrors[keyof TableCountForeignKeysByErrors];
 
 export type TableCountForeignKeysByResponses = {
-    200: number;
+    200: CountModelDto;
 };
 
 export type TableCountForeignKeysByResponse = TableCountForeignKeysByResponses[keyof TableCountForeignKeysByResponses];
@@ -3459,7 +3464,7 @@ export type TableCountForeignKeysToErrors = {
 export type TableCountForeignKeysToError = TableCountForeignKeysToErrors[keyof TableCountForeignKeysToErrors];
 
 export type TableCountForeignKeysToResponses = {
-    200: number;
+    200: CountModelDto;
 };
 
 export type TableCountForeignKeysToResponse = TableCountForeignKeysToResponses[keyof TableCountForeignKeysToResponses];
@@ -3783,7 +3788,7 @@ export type RowCountForeignKeysByErrors = {
 export type RowCountForeignKeysByError = RowCountForeignKeysByErrors[keyof RowCountForeignKeysByErrors];
 
 export type RowCountForeignKeysByResponses = {
-    200: number;
+    200: CountModelDto;
 };
 
 export type RowCountForeignKeysByResponse = RowCountForeignKeysByResponses[keyof RowCountForeignKeysByResponses];
@@ -3881,7 +3886,7 @@ export type RowCountForeignKeysToErrors = {
 export type RowCountForeignKeysToError = RowCountForeignKeysToErrors[keyof RowCountForeignKeysToErrors];
 
 export type RowCountForeignKeysToResponses = {
-    200: number;
+    200: CountModelDto;
 };
 
 export type RowCountForeignKeysToResponse = RowCountForeignKeysToResponses[keyof RowCountForeignKeysToResponses];
@@ -4113,7 +4118,7 @@ export type DeleteEndpointErrors = {
 export type DeleteEndpointError = DeleteEndpointErrors[keyof DeleteEndpointErrors];
 
 export type DeleteEndpointResponses = {
-    200: boolean;
+    200: SuccessModelDto;
 };
 
 export type DeleteEndpointResponse = DeleteEndpointResponses[keyof DeleteEndpointResponses];

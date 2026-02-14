@@ -15,7 +15,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    image: revisium/revisium:latest
+    image: revisium/revisium:v2.6.0
     ports:
       - 9000:8080
     environment:
