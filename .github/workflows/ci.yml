@@ -37,13 +37,17 @@ jobs:
 
       - name: Start Revisium
         run: |
-          nohup npx @revisium/standalone --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
+          npx @revisium/standalone --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
           echo $! > revisium.pid
+          echo "Started with PID $(cat revisium.pid)"
 
       - name: Wait for Revisium to be ready
         run: |
           for i in $(seq 1 300); do
-            curl -sf http://localhost:9000/api/health/liveness > /dev/null 2>&1 && echo "Ready after ${i}s" && exit 0
+            if curl -sf http://localhost:9000/health/readiness > /dev/null 2>&1; then
+              echo "Ready after ${i}s"
+              exit 0
+            fi
             sleep 1
           done
           echo "Timed out waiting for Revisium"
