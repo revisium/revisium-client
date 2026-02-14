@@ -4,8 +4,12 @@ import type {
   CreateRowsResponse,
   CreateTableResponse,
   GetTableRowsDto,
+  InitMigrationDto,
+  MigrationsResponse,
   PatchRow,
   PatchRowResponse,
+  RemoveMigrationDto,
+  RenameMigrationDto,
   RenameRowResponse,
   RenameTableResponse,
   RevisionChangesResponse,
@@ -14,6 +18,7 @@ import type {
   RowsConnection,
   TableModel,
   TablesConnection,
+  UpdateMigrationDto,
   UpdateRowResponse,
   UpdateRowsResponse,
   UpdateTableResponse,
@@ -190,6 +195,28 @@ export class RevisiumScope {
     return ops.getChanges(this._scopeContext);
   }
 
+  async getMigrations(): Promise<MigrationsResponse> {
+    return ops.getMigrations(this._scopeContext);
+  }
+
+  async applyMigrations(
+    migrations: Array<
+      | InitMigrationDto
+      | UpdateMigrationDto
+      | RenameMigrationDto
+      | RemoveMigrationDto
+    >,
+  ): Promise<void> {
+    this.assertNotDisposed();
+    await ops.applyMigrations(this._scopeContext, migrations);
+    this._revisionId = await ops.fetchDraftRevisionId(
+      this._client,
+      this._branch,
+    );
+    this._stale = false;
+    this._owner.notifyBranchChanged(this._branchKey, this);
+  }
+
   async createTable(
     tableId: string,
     schema: object,
@@ -226,8 +253,9 @@ export class RevisiumScope {
   async createRows(
     tableId: string,
     rows: Array<{ rowId: string; data: object }>,
+    options?: { isRestore?: boolean },
   ): Promise<CreateRowsResponse> {
-    return ops.createRows(this._scopeContext, tableId, rows);
+    return ops.createRows(this._scopeContext, tableId, rows, options);
   }
 
   async updateRow(
@@ -241,8 +269,9 @@ export class RevisiumScope {
   async updateRows(
     tableId: string,
     rows: Array<{ rowId: string; data: object }>,
+    options?: { isRestore?: boolean },
   ): Promise<UpdateRowsResponse> {
-    return ops.updateRows(this._scopeContext, tableId, rows);
+    return ops.updateRows(this._scopeContext, tableId, rows, options);
   }
 
   async patchRow(

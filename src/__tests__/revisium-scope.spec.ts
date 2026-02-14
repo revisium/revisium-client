@@ -175,6 +175,22 @@ describe('RevisiumScope', () => {
       scope.dispose();
       await expect(scope.refresh()).rejects.toThrow('Scope has been disposed.');
     });
+
+    it('getMigrations throws after dispose', async () => {
+      const scope = createScope();
+      scope.dispose();
+      await expect(scope.getMigrations()).rejects.toThrow(
+        'Scope has been disposed.',
+      );
+    });
+
+    it('applyMigrations throws after dispose', async () => {
+      const scope = createScope();
+      scope.dispose();
+      await expect(scope.applyMigrations([])).rejects.toThrow(
+        'Scope has been disposed.',
+      );
+    });
   });
 
   describe('non-draft scope rejects mutations', () => {
@@ -272,6 +288,13 @@ describe('RevisiumScope', () => {
     it('updateRows throws for head scope', async () => {
       const scope = createScope({ isDraft: false, revisionMode: 'head' });
       await expect(scope.updateRows('t', [])).rejects.toThrow(
+        'Mutations are only allowed in draft revision',
+      );
+    });
+
+    it('applyMigrations throws for head scope', async () => {
+      const scope = createScope({ isDraft: false, revisionMode: 'head' });
+      await expect(scope.applyMigrations([])).rejects.toThrow(
         'Mutations are only allowed in draft revision',
       );
     });

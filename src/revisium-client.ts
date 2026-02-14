@@ -9,8 +9,13 @@ import type {
   CreateRowsResponse,
   CreateTableResponse,
   GetTableRowsDto,
+  InitMigrationDto,
+  MeModel,
+  MigrationsResponse,
   PatchRow,
   PatchRowResponse,
+  RemoveMigrationDto,
+  RenameMigrationDto,
   RenameRowResponse,
   RenameTableResponse,
   RevisionChangesResponse,
@@ -19,6 +24,7 @@ import type {
   RowsConnection,
   TableModel,
   TablesConnection,
+  UpdateMigrationDto,
   UpdateRowResponse,
   UpdateRowsResponse,
   UpdateTableResponse,
@@ -106,6 +112,10 @@ export class RevisiumClient implements ScopeOwner {
   loginWithToken(token: string): void {
     this._client.setConfig({ auth: token });
     this._isAuthenticated = true;
+  }
+
+  async me(): Promise<MeModel> {
+    return ops.me(this._client);
   }
 
   async setContext(options: SetContextOptions): Promise<void> {
@@ -254,6 +264,23 @@ export class RevisiumClient implements ScopeOwner {
     return ops.getChanges(this._scopeContext);
   }
 
+  async getMigrations(): Promise<MigrationsResponse> {
+    return ops.getMigrations(this._scopeContext);
+  }
+
+  async applyMigrations(
+    migrations: Array<
+      | InitMigrationDto
+      | UpdateMigrationDto
+      | RenameMigrationDto
+      | RemoveMigrationDto
+    >,
+  ): Promise<void> {
+    await ops.applyMigrations(this._scopeContext, migrations);
+    await this.refreshDraftRevisionId();
+    this.notifyScopesOnCurrentBranch();
+  }
+
   async createTable(
     tableId: string,
     schema: object,
@@ -290,8 +317,9 @@ export class RevisiumClient implements ScopeOwner {
   async createRows(
     tableId: string,
     rows: Array<{ rowId: string; data: object }>,
+    options?: { isRestore?: boolean },
   ): Promise<CreateRowsResponse> {
-    return ops.createRows(this._scopeContext, tableId, rows);
+    return ops.createRows(this._scopeContext, tableId, rows, options);
   }
 
   async updateRow(
@@ -305,8 +333,9 @@ export class RevisiumClient implements ScopeOwner {
   async updateRows(
     tableId: string,
     rows: Array<{ rowId: string; data: object }>,
+    options?: { isRestore?: boolean },
   ): Promise<UpdateRowsResponse> {
-    return ops.updateRows(this._scopeContext, tableId, rows);
+    return ops.updateRows(this._scopeContext, tableId, rows, options);
   }
 
   async patchRow(
