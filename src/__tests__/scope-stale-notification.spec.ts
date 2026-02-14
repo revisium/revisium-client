@@ -10,8 +10,8 @@ jest.unstable_mockModule('../generated/sdk.gen.js', () => ({
   revision: mockRevisionFn,
 }));
 
-const { RevisiumClient } = await import('../revisium-client.js');
-const { RevisiumScope } = await import('../revisium-scope.js');
+const { BranchScope } = await import('../branch-scope.js');
+const { RevisionScope } = await import('../revision-scope.js');
 
 type BranchContext = {
   organizationId: string;
@@ -33,87 +33,70 @@ function mockHeadRevision(id: string): void {
   mockHeadRevisionFn.mockResolvedValueOnce({ data: { id } });
 }
 
-describe('Scope stale notification', () => {
-  let client: InstanceType<typeof RevisiumClient>;
+async function createBranch(branchCtx: BranchContext = BRANCH) {
+  mockHeadRevision('head-1');
+  mockDraftRevision('draft-1');
+  return BranchScope.create({} as never, {
+    ...branchCtx,
+    client: {} as never,
+  });
+}
 
+describe('Scope stale notification (BranchScope)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
   });
 
-  describe('withContext creates scopes', () => {
-    it('creates draft scope', async () => {
-      mockDraftRevision('draft-1');
-      const scope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
+  describe('BranchScope.create fetches both IDs', () => {
+    it('fetches head and draft revision IDs', async () => {
+      mockHeadRevision('head-42');
+      mockDraftRevision('draft-42');
+      const bs = await BranchScope.create({} as never, {
+        ...BRANCH,
+        client: {} as never,
       });
-      expect(scope).toBeInstanceOf(RevisiumScope);
+      expect(bs.headRevisionId).toBe('head-42');
+      expect(bs.draftRevisionId).toBe('draft-42');
+    });
+  });
+
+  describe('draft() and head() return RevisionScopes', () => {
+    it('draft() returns draft RevisionScope', async () => {
+      const bs = await createBranch();
+      const scope = bs.draft();
+      expect(scope).toBeInstanceOf(RevisionScope);
+      expect(scope.isDraft).toBe(true);
       expect(scope.revisionId).toBe('draft-1');
-      expect(scope.isDraft).toBe(true);
     });
 
-    it('creates head scope', async () => {
-      mockHeadRevision('head-1');
-      const scope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'head',
-      });
+    it('head() returns head RevisionScope', async () => {
+      const bs = await createBranch();
+      const scope = bs.head();
+      expect(scope).toBeInstanceOf(RevisionScope);
+      expect(scope.isDraft).toBe(false);
       expect(scope.revisionId).toBe('head-1');
-      expect(scope.isDraft).toBe(false);
     });
 
-    it('creates explicit scope', async () => {
-      mockRevisionFn.mockResolvedValueOnce({
-        data: { id: 'explicit-1' },
-      });
-      const scope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'explicit-1',
-      });
+    it('revision() validates and returns explicit RevisionScope', async () => {
+      const bs = await createBranch();
+      mockRevisionFn.mockResolvedValueOnce({ data: { id: 'explicit-1' } });
+      const scope = await bs.revision('explicit-1');
+      expect(scope).toBeInstanceOf(RevisionScope);
+      expect(scope.isDraft).toBe(false);
       expect(scope.revisionId).toBe('explicit-1');
-      expect(scope.isDraft).toBe(false);
-    });
-
-    it('defaults to draft and master', async () => {
-      mockDraftRevision('draft-2');
-      const scope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-      });
-      expect(scope.branchName).toBe('master');
-      expect(scope.isDraft).toBe(true);
     });
   });
 
-  describe('sibling notification on commit', () => {
-    it('marks sibling scopes stale when one scope commits', async () => {
-      mockDraftRevision('draft-a');
-      const scopeA = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
-      });
-
-      mockDraftRevision('draft-b');
-      const scopeB = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
-      });
+  describe('sibling notification', () => {
+    it('marks sibling scopes stale when notifyBranchChanged is called', async () => {
+      const bs = await createBranch();
+      const scopeA = bs.draft();
+      const scopeB = bs.draft();
 
       expect(scopeA.isStale).toBe(false);
       expect(scopeB.isStale).toBe(false);
 
-      client.notifyBranchChanged(
+      bs.notifyBranchChanged(
         `${BRANCH.organizationId}/${BRANCH.projectName}/${BRANCH.branchName}`,
         scopeA,
       );
@@ -123,25 +106,12 @@ describe('Scope stale notification', () => {
     });
 
     it('does not mark explicit scope as stale', async () => {
-      mockRevisionFn.mockResolvedValueOnce({
-        data: { id: 'explicit-rev' },
-      });
-      const explicitScope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'explicit-rev',
-      });
+      const bs = await createBranch();
+      mockRevisionFn.mockResolvedValueOnce({ data: { id: 'explicit-rev' } });
+      const explicitScope = await bs.revision('explicit-rev');
+      const draftScope = bs.draft();
 
-      mockDraftRevision('draft-c');
-      const draftScope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
-      });
-
-      client.notifyBranchChanged(
+      bs.notifyBranchChanged(
         `${BRANCH.organizationId}/${BRANCH.projectName}/${BRANCH.branchName}`,
         draftScope,
       );
@@ -149,78 +119,54 @@ describe('Scope stale notification', () => {
       expect(explicitScope.isStale).toBe(false);
     });
 
-    it('does not mark scopes on different branches stale', async () => {
-      mockDraftRevision('draft-master');
-      const masterScope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: 'master',
-        revision: 'draft',
-      });
+    it('ignores notifications for different branch keys', async () => {
+      const bs = await createBranch();
+      const scope = bs.draft();
 
-      mockDraftRevision('draft-feature');
-      const featureScope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: 'feature',
-        revision: 'draft',
-      });
-
-      client.notifyBranchChanged(
-        `${BRANCH.organizationId}/${BRANCH.projectName}/master`,
-        masterScope,
-      );
-
-      expect(featureScope.isStale).toBe(false);
+      bs.notifyBranchChanged('other/branch/key');
+      expect(scope.isStale).toBe(false);
     });
   });
 
   describe('dispose and unregister', () => {
-    it('unregisters scope on dispose', async () => {
-      mockDraftRevision('draft-d');
-      const scope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
-      });
+    it('unregisters scope on dispose — not affected by future notifications', async () => {
+      const bs = await createBranch();
+      const scopeA = bs.draft();
+      const scopeB = bs.draft();
 
-      scope.dispose();
-      expect(scope.isDisposed).toBe(true);
+      scopeA.dispose();
+      expect(scopeA.isDisposed).toBe(true);
 
-      mockDraftRevision('draft-e');
-      const scopeB = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
-      });
-
-      client.notifyBranchChanged(
+      bs.notifyBranchChanged(
         `${BRANCH.organizationId}/${BRANCH.projectName}/${BRANCH.branchName}`,
         scopeB,
       );
-      expect(scope.isStale).toBe(false);
-    });
 
-    it('notifyBranchChanged is no-op for unknown branch key', () => {
-      expect(() => {
-        client.notifyBranchChanged('unknown/branch/key', {} as never);
-      }).not.toThrow();
+      expect(scopeA.isStale).toBe(false);
+    });
+  });
+
+  describe('refreshRevisionIds', () => {
+    it('updates stored head and draft IDs', async () => {
+      const bs = await createBranch();
+      expect(bs.headRevisionId).toBe('head-1');
+      expect(bs.draftRevisionId).toBe('draft-1');
+
+      mockHeadRevision('head-2');
+      mockDraftRevision('draft-2');
+      await bs.refreshRevisionIds();
+
+      expect(bs.headRevisionId).toBe('head-2');
+      expect(bs.draftRevisionId).toBe('draft-2');
     });
   });
 
   describe('stale auto-refresh via getRevisionId', () => {
     it('refreshes revisionId when scope is stale and refresh is called', async () => {
-      mockDraftRevision('draft-old');
-      const scope = await client.withContext({
-        organizationId: BRANCH.organizationId,
-        projectName: BRANCH.projectName,
-        branchName: BRANCH.branchName,
-        revision: 'draft',
-      });
+      const bs = await createBranch();
+      const scope = bs.draft();
 
-      expect(scope.revisionId).toBe('draft-old');
+      expect(scope.revisionId).toBe('draft-1');
 
       scope.markStale();
       expect(scope.isStale).toBe(true);

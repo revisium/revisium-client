@@ -11,6 +11,7 @@ export default tseslint.config(
       'eslint.config.mjs',
       'dist/**',
       'coverage/**',
+      'coverage-integration/**',
       'jest.config.js',
       'tsdown.config.ts',
       'openapi-ts.config.ts',
