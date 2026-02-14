@@ -37,11 +37,18 @@ jobs:
 
       - name: Start Revisium
         run: |
-          nohup npx @revisium/standalone@2.6.0 --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
+          nohup npx @revisium/standalone --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
           echo $! > revisium.pid
 
       - name: Wait for Revisium to be ready
-        run: npx wait-on http://localhost:9000/api/health/liveness --timeout 120000
+        run: |
+          for i in $(seq 1 120); do
+            curl -sf http://localhost:9000/api/health/liveness > /dev/null 2>&1 && echo "Ready after ${i}s" && exit 0
+            sleep 1
+          done
+          echo "Timed out waiting for Revisium"
+          cat revisium.log
+          exit 1
 
       - name: Run integration tests with coverage
         run: npm run test:integration:cov
