@@ -442,9 +442,10 @@ describe('RevisiumClient Integration', () => {
     expect(rc.revisionId).toBeDefined();
   });
 
-  it('getMigrations returns empty on fresh revision', async () => {
+  it('getMigrations returns migrations for committed tables', async () => {
     const migrations = await rc.getMigrations();
-    expect(migrations).toEqual([]);
+    expect(migrations.length).toBeGreaterThanOrEqual(1);
+    expect(migrations.some((m) => m.tableId === 'posts')).toBe(true);
   });
 
   it('applyMigrations and getMigrations round-trip', async () => {
