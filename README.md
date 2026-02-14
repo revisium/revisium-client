@@ -77,6 +77,8 @@ await client.login('username', 'password');
 client.loginWithToken('jwt-token');
 
 client.isAuthenticated(); // boolean
+
+const user = await client.me(); // { id, username, email, hasPassword }
 ```
 
 ### Context
@@ -105,6 +107,7 @@ await client.getTableSchema('posts');
 await client.getRows('posts', { first: 100 });
 await client.getRow('posts', 'post-1');
 await client.getChanges();
+await client.getMigrations();
 ```
 
 ### Write Operations (draft only)
@@ -121,19 +124,26 @@ await client.renameTable('posts', 'articles');
 // Rows
 await client.createRow('posts', 'row-1', data);
 await client.createRows('posts', [{ rowId: 'r1', data }, { rowId: 'r2', data }]);
+await client.createRows('posts', rows, { isRestore: true }); // restore mode
 await client.updateRow('posts', 'row-1', data);
 await client.updateRows('posts', [{ rowId: 'r1', data }]);
+await client.updateRows('posts', rows, { isRestore: true }); // restore mode
 await client.patchRow('posts', 'row-1', [{ op: 'replace', path: 'title', value: 'New' }]);
 await client.deleteRow('posts', 'row-1');
 await client.deleteRows('posts', ['row-1', 'row-2']);
 await client.renameRow('posts', 'row-1', 'post-1');
+
+// Migrations
+await client.applyMigrations([
+  { type: 'init', tableId: 'posts', schema },
+]);
 ```
 
 ### Version Control (draft only)
 
 ```typescript
 const revision = await client.commit('my changes');  // auto-refreshes draftRevisionId
-await client.revertChanges();                         // auto-refreshes draftRevisionId
+await client.revertChanges();                        // auto-refreshes draftRevisionId
 ```
 
 ### Isolated Scopes (`withContext`)
@@ -196,6 +206,8 @@ scope.client;          // underlying HTTP client (shared with parent)
 // Same data methods as RevisiumClient
 await scope.getTables();
 await scope.createRow('posts', 'row-1', data);
+await scope.getMigrations();
+await scope.applyMigrations(migrations);
 await scope.commit('message');
 // ... all other read/write/version-control methods
 

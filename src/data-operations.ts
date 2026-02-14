@@ -5,8 +5,13 @@ import type {
   CreateRowsResponse,
   CreateTableResponse,
   GetTableRowsDto,
+  InitMigrationDto,
+  MeModel,
+  MigrationsResponse,
   PatchRow,
   PatchRowResponse,
+  RemoveMigrationDto,
+  RenameMigrationDto,
   RenameRowResponse,
   RenameTableResponse,
   RevisionChangesResponse,
@@ -15,6 +20,7 @@ import type {
   RowsConnection,
   TableModel,
   TablesConnection,
+  UpdateMigrationDto,
   UpdateRowResponse,
   UpdateRowsResponse,
   UpdateTableResponse,
@@ -56,6 +62,41 @@ export function assertContext(ctx: ScopeContext): void {
   if (!ctx.branch.organizationId) {
     throw new Error('Context not set. Call setContext() first.');
   }
+}
+
+export async function me(client: Client): Promise<MeModel> {
+  return unwrap(await sdk.me({ client }));
+}
+
+export async function getMigrations(
+  ctx: ScopeContext,
+): Promise<MigrationsResponse> {
+  assertContext(ctx);
+  const revisionId = await ctx.getRevisionId();
+  const result = await sdk.migrations({
+    client: ctx.client,
+    path: { revisionId },
+  });
+  return unwrap(result);
+}
+
+export async function applyMigrations(
+  ctx: ScopeContext,
+  migrations: Array<
+    | InitMigrationDto
+    | UpdateMigrationDto
+    | RenameMigrationDto
+    | RemoveMigrationDto
+  >,
+): Promise<void> {
+  assertDraft(ctx);
+  const revisionId = await ctx.getRevisionId();
+  const result = await sdk.applyMigrations({
+    client: ctx.client,
+    path: { revisionId },
+    body: migrations,
+  });
+  unwrap(result);
 }
 
 export async function getTables(
@@ -216,6 +257,7 @@ export async function createRows(
   ctx: ScopeContext,
   tableId: string,
   rows: Array<{ rowId: string; data: object }>,
+  options?: { isRestore?: boolean },
 ): Promise<CreateRowsResponse> {
   assertDraft(ctx);
   const revisionId = await ctx.getRevisionId();
@@ -227,6 +269,7 @@ export async function createRows(
         rowId: r.rowId,
         data: r.data as { [key: string]: unknown },
       })),
+      isRestore: options?.isRestore,
     },
   });
   return unwrap(result);
@@ -252,6 +295,7 @@ export async function updateRows(
   ctx: ScopeContext,
   tableId: string,
   rows: Array<{ rowId: string; data: object }>,
+  options?: { isRestore?: boolean },
 ): Promise<UpdateRowsResponse> {
   assertDraft(ctx);
   const revisionId = await ctx.getRevisionId();
@@ -263,6 +307,7 @@ export async function updateRows(
         rowId: r.rowId,
         data: r.data as { [key: string]: unknown },
       })),
+      isRestore: options?.isRestore,
     },
   });
   return unwrap(result);

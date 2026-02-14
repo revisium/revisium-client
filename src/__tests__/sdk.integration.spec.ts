@@ -304,6 +304,12 @@ describe('RevisiumClient Integration', () => {
     });
   });
 
+  it('me returns authenticated user', async () => {
+    const user = await rc.me();
+    expect(user.username).toBe(USERNAME);
+    expect(user.id).toBeDefined();
+  });
+
   it('setContext with draft revision', async () => {
     await rc.setContext({
       organizationId: USERNAME,
@@ -434,6 +440,61 @@ describe('RevisiumClient Integration', () => {
     await rc.revertChanges();
     expect(rc.isDraft).toBe(true);
     expect(rc.revisionId).toBeDefined();
+  });
+
+  it('getMigrations returns migrations for committed tables', async () => {
+    const migrations = await rc.getMigrations();
+    expect(migrations.length).toBeGreaterThanOrEqual(1);
+    expect(migrations.some((m) => m.tableId === 'posts')).toBe(true);
+  });
+
+  it('applyMigrations and getMigrations round-trip', async () => {
+    await rc.applyMigrations([
+      {
+        changeType: 'init',
+        tableId: 'migrated-table',
+        hash: 'abc123',
+        id: new Date().toISOString(),
+        schema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', default: '' },
+          },
+          additionalProperties: false,
+          required: ['name'],
+        },
+      },
+    ]);
+
+    const migrations = await rc.getMigrations();
+    expect(migrations.length).toBeGreaterThanOrEqual(1);
+    expect(migrations.some((m) => m.tableId === 'migrated-table')).toBe(true);
+
+    await rc.deleteTable('migrated-table');
+    await rc.revertChanges();
+  });
+
+  it('createRows with isRestore', async () => {
+    await rc.setContext({
+      organizationId: USERNAME,
+      projectName,
+      revision: 'draft',
+    });
+
+    await rc.createTable('restore-test', tableSchema);
+
+    const result = await rc.createRows(
+      'restore-test',
+      [
+        { rowId: 'r1', data: { title: 'A', count: 1 } },
+        { rowId: 'r2', data: { title: 'B', count: 2 } },
+      ],
+      { isRestore: true },
+    );
+    expect(result.rows).toHaveLength(2);
+
+    await rc.deleteTable('restore-test');
+    await rc.revertChanges();
   });
 
   it('deleteRow and deleteTable', async () => {
