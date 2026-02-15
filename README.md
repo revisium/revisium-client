@@ -191,8 +191,13 @@ await scope.getRowChanges({ tableId: 'posts' });
 
 // Migrations
 await scope.getMigrations();
+```
 
-// Endpoints
+### RevisionScope — Endpoint Operations
+
+Endpoint operations work on any revision (draft, head, or explicit).
+
+```typescript
 await scope.getEndpoints();
 await scope.getEndpointRelatives(endpointId);
 await scope.createEndpoint({ type: 'GRAPHQL' });
