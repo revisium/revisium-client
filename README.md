@@ -23,17 +23,18 @@ npm install @revisium/client
 import { RevisiumClient } from '@revisium/client';
 
 const client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
+await client.login('admin', 'admin');
 
-// Set context — resolves revisionId from branch
-await client.setContext({
-  organizationId: 'admin',
-  projectName: 'my-project',
-  branchName: 'master',   // default: 'master'
-  revision: 'draft',       // default: 'draft'
+// Navigate to a revision scope
+const scope = await client.revision({
+  org: 'admin',
+  project: 'my-project',
+  // branch: 'master',  // default
+  // revision: 'draft', // default
 });
 
 // Create table with schema
-await client.createTable('posts', {
+await scope.createTable('posts', {
   type: 'object',
   properties: {
     title: { type: 'string', default: '' },
@@ -44,32 +45,22 @@ await client.createTable('posts', {
 });
 
 // Create row
-await client.createRow('posts', 'post-1', {
+await scope.createRow('posts', 'post-1', {
   title: 'Hello World',
   published: true,
 });
 
 // Read data
-const rows = await client.getRows('posts', { first: 100 });
-const row = await client.getRow('posts', 'post-1');
+const rows = await scope.getRows('posts', { first: 100 });
+const row = await scope.getRow('posts', 'post-1');
 
 // Commit changes
-await client.commit('Initial content');
-
-// Read committed data (head revision)
-await client.setContext({
-  organizationId: 'admin',
-  projectName: 'my-project',
-  revision: 'head',
-});
-const tables = await client.getTables();
+await scope.commit('Initial content');
 ```
 
 ## API
 
-### Authentication (optional)
-
-Authentication is not required when the server runs in no-auth mode. If auth is enabled:
+### Authentication
 
 ```typescript
 await client.login('username', 'password');
@@ -77,177 +68,240 @@ await client.login('username', 'password');
 client.loginWithToken('jwt-token');
 
 client.isAuthenticated(); // boolean
-
 const user = await client.me(); // { id, username, email, hasPassword }
 ```
 
-### Context
+### Scope Hierarchy
+
+The client provides a hierarchical navigation model:
+
+```
+RevisiumClient
+  └── OrgScope             — organization-level operations
+       └── ProjectScope    — project-level operations
+            └── BranchScope — branch-level operations, holds head + draft revision IDs
+                 └── RevisionScope — all data operations (tables, rows, migrations)
+```
+
+Each level is created synchronously except `BranchScope` (fetches head + draft revision IDs) and `RevisionScope` via `branch.revision(id)` (validates the revision exists).
+
+### Shortcuts
+
+For common cases, skip intermediate scopes with shortcuts on `RevisiumClient`:
 
 ```typescript
-await client.setContext({
-  organizationId: 'admin',
-  projectName: 'my-project',
-  branchName: 'master',      // default: 'master'
-  revision: 'draft',          // 'draft' | 'head' | '<revisionId>'
+// Jump directly to a branch
+const branch = await client.branch({
+  org: 'admin',
+  project: 'my-project',
+  branch: 'master', // default
 });
 
-client.organizationId;  // current org
-client.projectName;     // current project
-client.branchName;      // current branch
-client.revisionId;      // resolved revision ID
-client.isDraft;         // true if revision === 'draft'
+// Jump directly to a revision scope
+const scope = await client.revision({
+  org: 'admin',
+  project: 'my-project',
+  branch: 'master',    // default
+  revision: 'draft',   // 'draft' | 'head' | '<revisionId>', default: 'draft'
+});
 ```
 
-### Read Operations (any revision)
+### Full Hierarchy Navigation
 
 ```typescript
-await client.getTables({ first: 100, after: 'cursor' });
-await client.getTable('posts');
-await client.getTableSchema('posts');
-await client.getRows('posts', { first: 100 });
-await client.getRow('posts', 'post-1');
-await client.getChanges();
-await client.getMigrations();
+const org = client.org('admin');
+const project = org.project('my-project');
+const branch = await project.branch('master');
+
+const draft = branch.draft();   // RevisionScope for draft revision
+const head = branch.head();     // RevisionScope for head revision
+const rev = await branch.revision('some-revision-id'); // specific revision
 ```
 
-### Write Operations (draft only)
-
-Write methods throw if `revision` is not `'draft'`.
+### OrgScope
 
 ```typescript
+const org = client.org('admin');
+
+await org.getProjects({ first: 100, after: 'cursor' });
+await org.createProject({ projectName: 'new-project', branchName: 'master' });
+await org.getUsers();
+await org.addUser(userId, 'developer');
+await org.removeUser(userId);
+```
+
+### ProjectScope
+
+```typescript
+const project = client.org('admin').project('my-project');
+
+await project.get();
+await project.update({ isPublic: true });
+await project.delete();
+await project.getBranches();
+await project.getRootBranch();
+await project.createBranch('feature', revisionId);
+await project.getUsers();
+await project.addUser(userId, 'editor');
+await project.removeUser(userId);
+await project.getEndpoints();
+await project.createEndpoint({ type: 'GRAPHQL' });
+await project.deleteEndpoint(endpointId);
+await project.getEndpointRelatives(endpointId);
+```
+
+### BranchScope
+
+```typescript
+const branch = await client.branch({ org: 'admin', project: 'my-project' });
+
+branch.headRevisionId;   // string
+branch.draftRevisionId;  // string
+
+await branch.get();
+await branch.delete();
+await branch.getTouched();
+await branch.getRevisions({ first: 100 });
+await branch.getStartRevision();
+```
+
+### RevisionScope — Read Operations
+
+```typescript
+const scope = await client.revision({ org: 'admin', project: 'my-project' });
+
 // Tables
-await client.createTable('posts', schema);
-await client.updateTable('posts', patches);
-await client.deleteTable('posts');
-await client.renameTable('posts', 'articles');
+await scope.getTables({ first: 100, after: 'cursor' });
+await scope.getTable('posts');
+await scope.getTableSchema('posts');
+await scope.getTableCountRows('posts');
+await scope.getTableForeignKeysBy('posts');
+await scope.getTableForeignKeysTo('posts');
 
 // Rows
-await client.createRow('posts', 'row-1', data);
-await client.createRows('posts', [{ rowId: 'r1', data }, { rowId: 'r2', data }]);
-await client.createRows('posts', rows, { isRestore: true }); // restore mode
-await client.updateRow('posts', 'row-1', data);
-await client.updateRows('posts', [{ rowId: 'r1', data }]);
-await client.updateRows('posts', rows, { isRestore: true }); // restore mode
-await client.patchRow('posts', 'row-1', [{ op: 'replace', path: 'title', value: 'New' }]);
-await client.deleteRow('posts', 'row-1');
-await client.deleteRows('posts', ['row-1', 'row-2']);
-await client.renameRow('posts', 'row-1', 'post-1');
+await scope.getRows('posts', { first: 100 });
+await scope.getRow('posts', 'post-1');
+await scope.getRowForeignKeysBy('posts', 'post-1', 'comments');
+await scope.getRowForeignKeysTo('posts', 'post-1', 'authors');
+
+// Changes
+await scope.getChanges();
+await scope.getTableChanges({ changeTypes: ['ADDED', 'MODIFIED'] });
+await scope.getRowChanges({ tableId: 'posts' });
 
 // Migrations
-await client.applyMigrations([
-  { type: 'init', tableId: 'posts', schema },
-]);
+await scope.getMigrations();
+```
+
+### RevisionScope — Endpoint Operations
+
+Endpoint operations work on any revision (draft, head, or explicit).
+
+```typescript
+await scope.getEndpoints();
+await scope.getEndpointRelatives(endpointId);
+await scope.createEndpoint({ type: 'GRAPHQL' });
+await scope.deleteEndpoint(endpointId);
+```
+
+### RevisionScope — Write Operations (draft only)
+
+Write methods throw if the scope is not a draft revision.
+
+```typescript
+const draft = branch.draft();
+
+// Tables
+await draft.createTable('posts', schema);
+await draft.updateTable('posts', patches);
+await draft.deleteTable('posts');
+await draft.renameTable('posts', 'articles');
+
+// Rows
+await draft.createRow('posts', 'row-1', data);
+await draft.createRows('posts', [{ rowId: 'r1', data }, { rowId: 'r2', data }]);
+await draft.createRows('posts', rows, { isRestore: true });
+await draft.updateRow('posts', 'row-1', data);
+await draft.updateRows('posts', [{ rowId: 'r1', data }]);
+await draft.patchRow('posts', 'row-1', [{ op: 'replace', path: 'title', value: 'New' }]);
+await draft.patchRows('posts', { rows: [...] });
+await draft.deleteRow('posts', 'row-1');
+await draft.deleteRows('posts', ['row-1', 'row-2']);
+await draft.renameRow('posts', 'row-1', 'post-1');
+
+// Migrations
+await draft.applyMigrations([{ changeType: 'init', tableId: 'posts', ... }]);
+const results = await draft.applyMigrationsWithStatus(migrations);
+
+// File upload
+await draft.uploadFile('posts', 'post-1', 'avatar', file);
 ```
 
 ### Version Control (draft only)
 
 ```typescript
-const revision = await client.commit('my changes');  // auto-refreshes draftRevisionId
-await client.revertChanges();                        // auto-refreshes draftRevisionId
+const revision = await draft.commit('my changes');
+await draft.revertChanges();
 ```
 
-### Isolated Scopes (`withContext`)
+After `commit`, `revertChanges`, or `applyMigrations`, the scope automatically refreshes its `revisionId` and marks sibling scopes on the same branch as stale.
 
-Use `withContext()` to create isolated scopes that share authentication but have independent context. Useful for multi-context scenarios (e.g., handling parallel requests in a server).
+### Stale Scopes
+
+When one scope commits or reverts, all sibling scopes (created from the same `BranchScope`) on the same branch are marked stale.
 
 ```typescript
-const client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
-await client.login('admin', 'admin');
-
-// Create isolated scopes — each has its own revisionId
-const scopeA = await client.withContext({
-  organizationId: 'admin',
-  projectName: 'project-a',
-  revision: 'draft',
-});
-
-const scopeB = await client.withContext({
-  organizationId: 'admin',
-  projectName: 'project-b',
-  revision: 'draft',
-});
-
-// Scopes work independently
-await scopeA.createRow('posts', 'row-1', { title: 'Hello' });
-await scopeB.getTables();
-
-// Commit in one scope marks sibling scopes (same branch) as stale
-const scopeC = await client.withContext({
-  organizationId: 'admin',
-  projectName: 'project-a',
-  revision: 'draft',
-});
+const branch = await client.branch({ org: 'admin', project: 'my-project' });
+const scopeA = branch.draft();
+const scopeB = branch.draft();
 
 await scopeA.commit('changes');
-// scopeC.isStale === true — auto-refreshes on next data access
+// scopeB.isStale === true — auto-refreshes revisionId on next data access
 
-// Dispose when done to clean up tracking
-scopeA.dispose();
+scopeA.dispose(); // unregister from BranchScope tracking
 scopeB.dispose();
-scopeC.dispose();
 ```
 
-#### Scope Properties
+- Stale scopes auto-refresh their `revisionId` on the next data method call
+- Scopes with explicit `revisionId` (via `branch.revision(id)`) never go stale
+- Concurrent reads on a stale scope share a single refresh call (promise dedup)
+
+### RevisionScope Properties
 
 ```typescript
 scope.organizationId;  // string
 scope.projectName;     // string
 scope.branchName;      // string
-scope.revisionId;      // string — current cached revisionId
+scope.revisionId;      // string
 scope.isDraft;         // boolean
-scope.isStale;         // boolean — true if sibling committed
+scope.isStale;         // boolean
 scope.isDisposed;      // boolean
-scope.client;          // underlying HTTP client (shared with parent)
+scope.client;          // underlying HTTP client
 ```
-
-#### Scope Methods
-
-```typescript
-// Same data methods as RevisiumClient
-await scope.getTables();
-await scope.createRow('posts', 'row-1', data);
-await scope.getMigrations();
-await scope.applyMigrations(migrations);
-await scope.commit('message');
-// ... all other read/write/version-control methods
-
-// Scope-specific
-scope.markStale();      // manually mark as stale
-await scope.refresh();  // manually refresh revisionId
-scope.dispose();        // unregister from parent tracking
-```
-
-#### Stale Behavior
-
-- When one scope commits or reverts, all sibling scopes on the same branch are marked stale
-- Stale scopes auto-refresh their `revisionId` on the next data method call
-- Scopes with explicit `revisionId` (not `'draft'` or `'head'`) never go stale
-- Concurrent reads on a stale scope share a single refresh API call (promise dedup)
 
 ## Error Handling
 
-`RevisiumClient` methods throw on errors instead of returning `{ data, error }`:
+Methods throw on errors instead of returning `{ data, error }`:
 
 ```typescript
-// Context not set
-try {
-  await client.getRows('posts');
-} catch (err) {
-  console.error(err.message); // "Context not set. Call setContext() first."
-}
+const branch = await client.branch({ org: 'admin', project: 'my-project' });
 
 // Mutations in read-only revision
-await client.setContext({
-  organizationId: 'admin',
-  projectName: 'my-project',
-  revision: 'head', // or explicit revisionId
-});
-
+const head = branch.head();
 try {
-  await client.createRow('posts', 'row-1', { title: 'Hello' });
+  await head.createRow('posts', 'row-1', { title: 'Hello' });
 } catch (err) {
   console.error(err.message);
-  // "Mutations are only allowed in draft revision. Use setContext({ revision: "draft" })."
+  // "Mutations are only allowed in draft revision."
+}
+
+// Disposed scope
+const scope = branch.draft();
+scope.dispose();
+try {
+  await scope.getTables();
+} catch (err) {
+  console.error(err.message); // "Scope has been disposed."
 }
 ```
 

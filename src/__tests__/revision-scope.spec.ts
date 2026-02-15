@@ -1,14 +1,18 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-import { RevisiumScope } from '../revisium-scope.js';
-import type { ScopeOwner } from '../revisium-client.js';
+import { RevisionScope } from '../revision-scope.js';
+import type { ScopeOwner } from '../scope-owner.js';
 import type { BranchContext } from '../data-operations.js';
 
 const mockOwner: ScopeOwner = {
   notifyBranchChanged: jest.fn(),
   unregisterScope: jest.fn(),
+  refreshRevisionIds: jest
+    .fn<() => Promise<void>>()
+    .mockResolvedValue(undefined),
 };
 
 const branch: BranchContext = {
+  client: {} as never,
   organizationId: 'org',
   projectName: 'proj',
   branchName: 'master',
@@ -21,8 +25,8 @@ function createScope(
     revisionMode: 'draft' | 'head' | 'explicit';
     owner: ScopeOwner;
   }> = {},
-): RevisiumScope {
-  return new RevisiumScope({
+): RevisionScope {
+  return new RevisionScope({
     client: {} as never,
     branch,
     revisionId: overrides.revisionId ?? 'rev-1',
@@ -32,7 +36,7 @@ function createScope(
   });
 }
 
-describe('RevisiumScope', () => {
+describe('RevisionScope', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -65,7 +69,7 @@ describe('RevisiumScope', () => {
 
     it('exposes client', () => {
       const client = { fake: true } as never;
-      const scope = new RevisiumScope({
+      const scope = new RevisionScope({
         client,
         branch,
         revisionId: 'rev-1',
@@ -121,6 +125,9 @@ describe('RevisiumScope', () => {
       const owner: ScopeOwner = {
         notifyBranchChanged: jest.fn(),
         unregisterScope: jest.fn(),
+        refreshRevisionIds: jest
+          .fn<() => Promise<void>>()
+          .mockResolvedValue(undefined),
       };
       const scope = createScope({ owner });
       scope.dispose();
@@ -131,6 +138,9 @@ describe('RevisiumScope', () => {
       const owner: ScopeOwner = {
         notifyBranchChanged: jest.fn(),
         unregisterScope: jest.fn(),
+        refreshRevisionIds: jest
+          .fn<() => Promise<void>>()
+          .mockResolvedValue(undefined),
       };
       const scope = createScope({ owner });
       scope.dispose();
@@ -188,6 +198,22 @@ describe('RevisiumScope', () => {
       const scope = createScope();
       scope.dispose();
       await expect(scope.applyMigrations([])).rejects.toThrow(
+        'Scope has been disposed.',
+      );
+    });
+
+    it('deleteEndpoint throws after dispose', async () => {
+      const scope = createScope();
+      scope.dispose();
+      await expect(scope.deleteEndpoint('ep-1')).rejects.toThrow(
+        'Scope has been disposed.',
+      );
+    });
+
+    it('getEndpointRelatives throws after dispose', async () => {
+      const scope = createScope();
+      scope.dispose();
+      await expect(scope.getEndpointRelatives('ep-1')).rejects.toThrow(
         'Scope has been disposed.',
       );
     });
