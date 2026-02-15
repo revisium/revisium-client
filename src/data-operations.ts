@@ -1102,4 +1102,4 @@ export async function uploadFile(
   return unwrap(result);
 }
 
-export type { MeModel };
+export type { MeModel } from './generated/types.gen.js';
