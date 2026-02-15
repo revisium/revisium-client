@@ -195,6 +195,8 @@ await scope.getMigrations();
 // Endpoints
 await scope.getEndpoints();
 await scope.getEndpointRelatives(endpointId);
+await scope.createEndpoint({ type: 'GRAPHQL' });
+await scope.deleteEndpoint(endpointId);
 ```
 
 ### RevisionScope — Write Operations (draft only)
@@ -225,10 +227,6 @@ await draft.renameRow('posts', 'row-1', 'post-1');
 // Migrations
 await draft.applyMigrations([{ changeType: 'init', tableId: 'posts', ... }]);
 const results = await draft.applyMigrationsWithStatus(migrations);
-
-// Endpoints
-await draft.createEndpoint({ type: 'GRAPHQL' });
-await draft.deleteEndpoint(endpointId);
 
 // File upload
 await draft.uploadFile('posts', 'post-1', 'avatar', file);
