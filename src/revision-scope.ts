@@ -488,12 +488,14 @@ export class RevisionScope {
   }
 
   async deleteEndpoint(endpointId: string): Promise<void> {
+    this.assertNotDisposed();
     return ops.deleteEndpoint(this._client, endpointId);
   }
 
   async getEndpointRelatives(
     endpointId: string,
   ): Promise<GetEndpointResultDto> {
+    this.assertNotDisposed();
     return ops.getEndpointRelatives(this._client, endpointId);
   }
 

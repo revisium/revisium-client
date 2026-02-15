@@ -281,6 +281,8 @@ scope.client;          // underlying HTTP client
 Methods throw on errors instead of returning `{ data, error }`:
 
 ```typescript
+const branch = await client.branch({ org: 'admin', project: 'my-project' });
+
 // Mutations in read-only revision
 const head = branch.head();
 try {

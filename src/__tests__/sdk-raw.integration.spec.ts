@@ -22,6 +22,13 @@ describe('SDK Integration', () => {
     expect(result.error).toBeUndefined();
     token = result.data!.accessToken;
     testClient.setConfig({ auth: token });
+
+    const createResult = await sdk.createProject({
+      client: testClient,
+      path: { organizationId },
+      body: { projectName },
+    });
+    expect(createResult.error).toBeUndefined();
   });
 
   afterAll(async () => {
@@ -38,16 +45,7 @@ describe('SDK Integration', () => {
     expect(result.data!.username).toBe(USERNAME);
   });
 
-  it('projects lifecycle', async () => {
-    const createResult = await sdk.createProject({
-      client: testClient,
-      path: { organizationId },
-      body: { projectName },
-    });
-
-    expect(createResult.error).toBeUndefined();
-    expect(createResult.data!.name).toBe(projectName);
-
+  it('get project', async () => {
     const getResult = await sdk.project({
       client: testClient,
       path: { organizationId, projectName },
@@ -55,7 +53,9 @@ describe('SDK Integration', () => {
 
     expect(getResult.error).toBeUndefined();
     expect(getResult.data!.name).toBe(projectName);
+  });
 
+  it('list projects', async () => {
     const listResult = await sdk.projects({
       client: testClient,
       path: { organizationId },

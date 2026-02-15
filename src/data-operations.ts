@@ -43,6 +43,7 @@ import type {
   UploadFileResponse,
   UsersOrganizationConnection,
   UsersProjectConnection,
+  MeModel,
 } from './generated/types.gen.js';
 
 // ---------------------------------------------------------------------------
@@ -370,7 +371,7 @@ export async function getRevisions(
       projectName: branch.projectName,
       branchName: branch.branchName,
     },
-    query: { first: options?.first ?? 100, ...options },
+    query: { ...options, first: options?.first ?? 100 },
   });
   return unwrap(result);
 }
@@ -968,7 +969,7 @@ export async function getTableChanges(
   const result = await sdk.tableChanges({
     client: ctx.client,
     path: { revisionId },
-    query: { first: options?.first ?? 100, ...options },
+    query: { ...options, first: options?.first ?? 100 },
   });
   return unwrap(result);
 }
@@ -991,7 +992,7 @@ export async function getRowChanges(
   const result = await sdk.rowChanges({
     client: ctx.client,
     path: { revisionId },
-    query: { first: options?.first ?? 100, ...options },
+    query: { ...options, first: options?.first ?? 100 },
   });
   return unwrap(result);
 }
@@ -1049,7 +1050,6 @@ export async function createEndpoint(
   ctx: ScopeContext,
   body: CreateEndpointDto,
 ): Promise<EndpointModel> {
-  assertDraft(ctx);
   const revisionId = await ctx.getRevisionId();
   const result = await sdk.createEndpoint({
     client: ctx.client,
@@ -1102,6 +1102,4 @@ export async function uploadFile(
   return unwrap(result);
 }
 
-// Re-export MeModel for convenience
-import type { MeModel } from './generated/types.gen.js';
 export type { MeModel };

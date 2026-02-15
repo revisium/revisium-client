@@ -16,6 +16,7 @@ const sdkMock = {
   addUserToProject: jest.fn<AnyFn>(),
   removeUserFromProject: jest.fn<AnyFn>(),
   revision: jest.fn<AnyFn>(),
+  revisions: jest.fn<AnyFn>(),
   parentRevision: jest.fn<AnyFn>(),
   childRevision: jest.fn<AnyFn>(),
   uploadFile: jest.fn<AnyFn>(),
@@ -176,6 +177,43 @@ describe('uploadFile', () => {
     await expect(
       ops.uploadFile(scopeCtx(false), 'posts', 'post-1', 'avatar', new Blob()),
     ).rejects.toThrow('Mutations are only allowed in draft revision');
+  });
+});
+
+describe('getRevisions', () => {
+  const branchCtx = {
+    client: {} as never,
+    organizationId: 'org1',
+    projectName: 'proj1',
+    branchName: 'master',
+  };
+
+  it('defaults first to 100 when not provided', async () => {
+    sdkMock.revisions.mockResolvedValue({
+      data: { edges: [], totalCount: 0 },
+    });
+
+    await ops.getRevisions({} as never, branchCtx, { before: 'rev-5' });
+
+    expect(sdkMock.revisions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({ first: 100, before: 'rev-5' }),
+      }),
+    );
+  });
+
+  it('uses provided first value', async () => {
+    sdkMock.revisions.mockResolvedValue({
+      data: { edges: [], totalCount: 0 },
+    });
+
+    await ops.getRevisions({} as never, branchCtx, { first: 10 });
+
+    expect(sdkMock.revisions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({ first: 10 }),
+      }),
+    );
   });
 });
 

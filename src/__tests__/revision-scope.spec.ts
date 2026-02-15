@@ -201,6 +201,22 @@ describe('RevisionScope', () => {
         'Scope has been disposed.',
       );
     });
+
+    it('deleteEndpoint throws after dispose', async () => {
+      const scope = createScope();
+      scope.dispose();
+      await expect(scope.deleteEndpoint('ep-1')).rejects.toThrow(
+        'Scope has been disposed.',
+      );
+    });
+
+    it('getEndpointRelatives throws after dispose', async () => {
+      const scope = createScope();
+      scope.dispose();
+      await expect(scope.getEndpointRelatives('ep-1')).rejects.toThrow(
+        'Scope has been disposed.',
+      );
+    });
   });
 
   describe('non-draft scope rejects mutations', () => {
