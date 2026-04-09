@@ -62,11 +62,24 @@ await scope.commit('Initial content');
 
 ### Authentication
 
+#### JWT Token
+
 ```typescript
 await client.login('username', 'password');
 // or
 client.loginWithToken('jwt-token');
+```
 
+#### API Key (recommended for programmatic access)
+
+```typescript
+client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxx');
+// Sends X-Api-Key header on all requests
+```
+
+#### Common
+
+```typescript
 client.isAuthenticated(); // boolean
 const user = await client.me(); // { id, username, email, hasPassword }
 ```

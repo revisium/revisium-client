@@ -62,6 +62,19 @@ export class RevisiumClient {
     this._isAuthenticated = true;
   }
 
+  loginWithApiKey(key: string): void {
+    if (!key.startsWith('rev_')) {
+      throw new Error(
+        'Invalid API key format: key must start with "rev_" prefix',
+      );
+    }
+    this._client.setConfig({
+      auth: undefined,
+      headers: { 'X-Api-Key': key },
+    });
+    this._isAuthenticated = true;
+  }
+
   async me(): Promise<MeModel> {
     return ops.me(this._client);
   }
