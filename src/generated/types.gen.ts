@@ -11,6 +11,7 @@ export type LoginDto = {
 
 export type LoginResponse = {
     accessToken: string;
+    expiresIn: number;
 };
 
 export type ErrorModel = {
@@ -26,6 +27,10 @@ export type ErrorModel = {
      * Error type
      */
     error: string;
+};
+
+export type RefreshResponse = {
+    expiresIn: number;
 };
 
 export type CreateUserDto = {
@@ -1151,10 +1156,82 @@ export type LoginErrors = {
 export type LoginError = LoginErrors[keyof LoginErrors];
 
 export type LoginResponses = {
-    200: LoginResponse;
+    201: LoginResponse;
 };
 
 export type LoginResponse2 = LoginResponses[keyof LoginResponses];
+
+export type RefreshData = {
+    body?: never;
+    headers: {
+        /**
+         * Must include `rev_rt=<opaque token>`
+         */
+        Cookie: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/auth/refresh';
+};
+
+export type RefreshErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Missing, invalid, expired, or reuse-detected `rev_rt` refresh cookie. All auth cookies are cleared on the response so the client-side session is torn down.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type RefreshError = RefreshErrors[keyof RefreshErrors];
+
+export type RefreshResponses = {
+    200: RefreshResponse;
+};
+
+export type RefreshResponse2 = RefreshResponses[keyof RefreshResponses];
+
+export type LogoutData = {
+    body?: never;
+    headers?: {
+        /**
+         * Typically includes `rev_rt=<opaque token>`. If missing, local session state is still cleared on the response.
+         */
+        Cookie?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/auth/logout';
+};
+
+export type LogoutErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Missing or invalid `rev_rt` refresh cookie. Note: in practice logout is best-effort — if the cookie is absent, the client-side session is still cleared and the endpoint returns 204. A 401 here only surfaces if the server refuses the teardown for another reason.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type LogoutError = LogoutErrors[keyof LogoutErrors];
+
+export type LogoutResponses = {
+    204: void;
+};
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
 
 export type CreateUserData = {
     body: CreateUserDto;
@@ -4265,3 +4342,31 @@ export type LivenessResponses = {
 };
 
 export type LivenessResponse = LivenessResponses[keyof LivenessResponses];
+
+export type StorageControllerGetFileData = {
+    body?: never;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/files/{key}';
+};
+
+export type StorageControllerGetFileResponses = {
+    200: unknown;
+};
+
+export type BillingCallbackControllerHandleCallbackData = {
+    body?: never;
+    headers: {
+        'x-signature': string;
+        'x-timestamp': string;
+    };
+    path?: never;
+    query?: never;
+    url: '/billing/payment-callback';
+};
+
+export type BillingCallbackControllerHandleCallbackResponses = {
+    200: unknown;
+};

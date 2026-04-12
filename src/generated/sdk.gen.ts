@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddUserToOrganizationData, AddUserToOrganizationErrors, AddUserToOrganizationResponses, AddUserToProjectData, AddUserToProjectErrors, AddUserToProjectResponses, ApplyMigrationsData, ApplyMigrationsErrors, ApplyMigrationsResponses, BranchData, BranchErrors, BranchesData, BranchesErrors, BranchesResponses, BranchResponses, BranchTouchedData, BranchTouchedErrors, BranchTouchedResponses, ChildBranchesData, ChildBranchesErrors, ChildBranchesResponses, ChildRevisionData, ChildRevisionErrors, ChildRevisionResponses, CreateBranchData, CreateBranchErrors, CreateBranchResponses, CreateEndpointData, CreateEndpointErrors, CreateEndpointResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateRevisionData, CreateRevisionErrors, CreateRevisionResponses, CreateRowData, CreateRowErrors, CreateRowResponses, CreateRowsData, CreateRowsErrors, CreateRowsResponses, CreateTableData, CreateTableErrors, CreateTableResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteBranchData, DeleteBranchErrors, DeleteBranchResponses, DeleteEndpointData, DeleteEndpointErrors, DeleteEndpointResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteRowData, DeleteRowErrors, DeleteRowResponses, DeleteRowsData, DeleteRowsErrors, DeleteRowsResponses, DeleteTableData, DeleteTableErrors, DeleteTableResponses, DraftRevisionData, DraftRevisionErrors, DraftRevisionResponses, EndpointRelativesData, EndpointRelativesErrors, EndpointRelativesResponses, EndpointsData, EndpointsErrors, EndpointsResponses, GetConfigurationData, GetConfigurationResponses, HeadRevisionData, HeadRevisionErrors, HeadRevisionResponses, LivenessData, LivenessErrors, LivenessResponses, LoginData, LoginErrors, LoginResponses, MeData, MeErrors, MeResponses, MigrationsData, MigrationsErrors, MigrationsResponses, ParentBranchData, ParentBranchErrors, ParentBranchResponses, ParentRevisionData, ParentRevisionErrors, ParentRevisionResponses, PatchRowData, PatchRowErrors, PatchRowResponses, PatchRowsData, PatchRowsErrors, PatchRowsResponses, ProjectData, ProjectErrors, ProjectResponses, ProjectsData, ProjectsErrors, ProjectsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RemoveUserFromOrganizationData, RemoveUserFromOrganizationErrors, RemoveUserFromOrganizationResponses, RemoveUserFromProjectData, RemoveUserFromProjectErrors, RemoveUserFromProjectResponses, RenameRowData, RenameRowErrors, RenameRowResponses, RenameTableData, RenameTableErrors, RenameTableResponses, RevertChangesData, RevertChangesErrors, RevertChangesResponses, RevisionChangesData, RevisionChangesErrors, RevisionChangesResponses, RevisionData, RevisionErrors, RevisionResponses, RevisionsData, RevisionsErrors, RevisionsResponses, RootBranchData, RootBranchErrors, RootBranchResponses, RowChangesData, RowChangesErrors, RowChangesResponses, RowCountForeignKeysByData, RowCountForeignKeysByErrors, RowCountForeignKeysByResponses, RowCountForeignKeysToData, RowCountForeignKeysToErrors, RowCountForeignKeysToResponses, RowData, RowErrors, RowForeignKeysByData, RowForeignKeysByErrors, RowForeignKeysByResponses, RowForeignKeysToData, RowForeignKeysToErrors, RowForeignKeysToResponses, RowResponses, RowsData, RowsErrors, RowsResponses, StartRevisionData, StartRevisionErrors, StartRevisionResponses, TableChangesData, TableChangesErrors, TableChangesResponses, TableCountForeignKeysByData, TableCountForeignKeysByErrors, TableCountForeignKeysByResponses, TableCountForeignKeysToData, TableCountForeignKeysToErrors, TableCountForeignKeysToResponses, TableCountRowsData, TableCountRowsErrors, TableCountRowsResponses, TableData, TableErrors, TableForeignKeysByData, TableForeignKeysByErrors, TableForeignKeysByResponses, TableForeignKeysToData, TableForeignKeysToErrors, TableForeignKeysToResponses, TableResponses, TableSchemaData, TableSchemaErrors, TableSchemaResponses, TablesData, TablesErrors, TablesResponses, UpdatePasswordData, UpdatePasswordErrors, UpdatePasswordResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateRowData, UpdateRowErrors, UpdateRowResponses, UpdateRowsData, UpdateRowsErrors, UpdateRowsResponses, UpdateTableData, UpdateTableErrors, UpdateTableResponses, UploadFileData, UploadFileErrors, UploadFileResponses, UsersOrganizationData, UsersOrganizationErrors, UsersOrganizationResponses, UsersProjectData, UsersProjectErrors, UsersProjectResponses } from './types.gen';
+import type { AddUserToOrganizationData, AddUserToOrganizationErrors, AddUserToOrganizationResponses, AddUserToProjectData, AddUserToProjectErrors, AddUserToProjectResponses, ApplyMigrationsData, ApplyMigrationsErrors, ApplyMigrationsResponses, BillingCallbackControllerHandleCallbackData, BillingCallbackControllerHandleCallbackResponses, BranchData, BranchErrors, BranchesData, BranchesErrors, BranchesResponses, BranchResponses, BranchTouchedData, BranchTouchedErrors, BranchTouchedResponses, ChildBranchesData, ChildBranchesErrors, ChildBranchesResponses, ChildRevisionData, ChildRevisionErrors, ChildRevisionResponses, CreateBranchData, CreateBranchErrors, CreateBranchResponses, CreateEndpointData, CreateEndpointErrors, CreateEndpointResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateRevisionData, CreateRevisionErrors, CreateRevisionResponses, CreateRowData, CreateRowErrors, CreateRowResponses, CreateRowsData, CreateRowsErrors, CreateRowsResponses, CreateTableData, CreateTableErrors, CreateTableResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteBranchData, DeleteBranchErrors, DeleteBranchResponses, DeleteEndpointData, DeleteEndpointErrors, DeleteEndpointResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteRowData, DeleteRowErrors, DeleteRowResponses, DeleteRowsData, DeleteRowsErrors, DeleteRowsResponses, DeleteTableData, DeleteTableErrors, DeleteTableResponses, DraftRevisionData, DraftRevisionErrors, DraftRevisionResponses, EndpointRelativesData, EndpointRelativesErrors, EndpointRelativesResponses, EndpointsData, EndpointsErrors, EndpointsResponses, GetConfigurationData, GetConfigurationResponses, HeadRevisionData, HeadRevisionErrors, HeadRevisionResponses, LivenessData, LivenessErrors, LivenessResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, MeData, MeErrors, MeResponses, MigrationsData, MigrationsErrors, MigrationsResponses, ParentBranchData, ParentBranchErrors, ParentBranchResponses, ParentRevisionData, ParentRevisionErrors, ParentRevisionResponses, PatchRowData, PatchRowErrors, PatchRowResponses, PatchRowsData, PatchRowsErrors, PatchRowsResponses, ProjectData, ProjectErrors, ProjectResponses, ProjectsData, ProjectsErrors, ProjectsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RefreshData, RefreshErrors, RefreshResponses, RemoveUserFromOrganizationData, RemoveUserFromOrganizationErrors, RemoveUserFromOrganizationResponses, RemoveUserFromProjectData, RemoveUserFromProjectErrors, RemoveUserFromProjectResponses, RenameRowData, RenameRowErrors, RenameRowResponses, RenameTableData, RenameTableErrors, RenameTableResponses, RevertChangesData, RevertChangesErrors, RevertChangesResponses, RevisionChangesData, RevisionChangesErrors, RevisionChangesResponses, RevisionData, RevisionErrors, RevisionResponses, RevisionsData, RevisionsErrors, RevisionsResponses, RootBranchData, RootBranchErrors, RootBranchResponses, RowChangesData, RowChangesErrors, RowChangesResponses, RowCountForeignKeysByData, RowCountForeignKeysByErrors, RowCountForeignKeysByResponses, RowCountForeignKeysToData, RowCountForeignKeysToErrors, RowCountForeignKeysToResponses, RowData, RowErrors, RowForeignKeysByData, RowForeignKeysByErrors, RowForeignKeysByResponses, RowForeignKeysToData, RowForeignKeysToErrors, RowForeignKeysToResponses, RowResponses, RowsData, RowsErrors, RowsResponses, StartRevisionData, StartRevisionErrors, StartRevisionResponses, StorageControllerGetFileData, StorageControllerGetFileResponses, TableChangesData, TableChangesErrors, TableChangesResponses, TableCountForeignKeysByData, TableCountForeignKeysByErrors, TableCountForeignKeysByResponses, TableCountForeignKeysToData, TableCountForeignKeysToErrors, TableCountForeignKeysToResponses, TableCountRowsData, TableCountRowsErrors, TableCountRowsResponses, TableData, TableErrors, TableForeignKeysByData, TableForeignKeysByErrors, TableForeignKeysByResponses, TableForeignKeysToData, TableForeignKeysToErrors, TableForeignKeysToResponses, TableResponses, TableSchemaData, TableSchemaErrors, TableSchemaResponses, TablesData, TablesErrors, TablesResponses, UpdatePasswordData, UpdatePasswordErrors, UpdatePasswordResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateRowData, UpdateRowErrors, UpdateRowResponses, UpdateRowsData, UpdateRowsErrors, UpdateRowsResponses, UpdateTableData, UpdateTableErrors, UpdateTableResponses, UploadFileData, UploadFileErrors, UploadFileResponses, UsersOrganizationData, UsersOrganizationErrors, UsersOrganizationResponses, UsersProjectData, UsersProjectErrors, UsersProjectResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -20,9 +20,10 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 /**
  * Authenticate and get access token
+ *
+ * Sets httpOnly auth cookies on success. The JSON body also carries `accessToken` + `expiresIn` for CLI / PAT consumers that use Bearer header auth and cannot manage cookies.
  */
 export const login = <ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>) => (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/auth/login',
     ...options,
     headers: {
@@ -32,10 +33,24 @@ export const login = <ThrowOnError extends boolean = false>(options: Options<Log
 });
 
 /**
+ * Refresh access token using refresh cookie
+ *
+ * Reads the httpOnly `rev_rt` cookie, rotates it, and returns new Set-Cookie headers for all three auth cookies. No request body. No bearer / api-key auth — this endpoint is cookie-driven.
+ */
+export const refresh = <ThrowOnError extends boolean = false>(options: Options<RefreshData, ThrowOnError>) => (options.client ?? client).post<RefreshResponses, RefreshErrors, ThrowOnError>({ url: '/api/auth/refresh', ...options });
+
+/**
+ * Log out and clear auth cookies
+ *
+ * Reads the `rev_rt` cookie (sent because its Path `/api/auth/` prefix-matches this endpoint), revokes the refresh-token family server-side, and clears all three auth cookies on the response. No request body. No bearer / api-key auth — this endpoint is cookie-driven.
+ */
+export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>) => (options?.client ?? client).post<LogoutResponses, LogoutErrors, ThrowOnError>({ url: '/api/auth/logout', ...options });
+
+/**
  * Create a new user (admin only)
  */
 export const createUser = <ThrowOnError extends boolean = false>(options: Options<CreateUserData, ThrowOnError>) => (options.client ?? client).post<CreateUserResponses, CreateUserErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/auth/user',
     ...options,
     headers: {
@@ -48,7 +63,7 @@ export const createUser = <ThrowOnError extends boolean = false>(options: Option
  * Update your password
  */
 export const updatePassword = <ThrowOnError extends boolean = false>(options: Options<UpdatePasswordData, ThrowOnError>) => (options.client ?? client).put<UpdatePasswordResponses, UpdatePasswordErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/auth/password',
     ...options,
     headers: {
@@ -61,7 +76,7 @@ export const updatePassword = <ThrowOnError extends boolean = false>(options: Op
  * Get current authenticated user
  */
 export const me = <ThrowOnError extends boolean = false>(options?: Options<MeData, ThrowOnError>) => (options?.client ?? client).get<MeResponses, MeErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/user/me',
     ...options
 });
@@ -70,7 +85,7 @@ export const me = <ThrowOnError extends boolean = false>(options?: Options<MeDat
  * List projects in organization
  */
 export const projects = <ThrowOnError extends boolean = false>(options: Options<ProjectsData, ThrowOnError>) => (options.client ?? client).get<ProjectsResponses, ProjectsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects',
     ...options
 });
@@ -79,7 +94,7 @@ export const projects = <ThrowOnError extends boolean = false>(options: Options<
  * Create a new project
  */
 export const createProject = <ThrowOnError extends boolean = false>(options: Options<CreateProjectData, ThrowOnError>) => (options.client ?? client).post<CreateProjectResponses, CreateProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects',
     ...options,
     headers: {
@@ -92,7 +107,7 @@ export const createProject = <ThrowOnError extends boolean = false>(options: Opt
  * Remove a user from the organization
  */
 export const removeUserFromOrganization = <ThrowOnError extends boolean = false>(options: Options<RemoveUserFromOrganizationData, ThrowOnError>) => (options.client ?? client).delete<RemoveUserFromOrganizationResponses, RemoveUserFromOrganizationErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/users',
     ...options,
     headers: {
@@ -105,7 +120,7 @@ export const removeUserFromOrganization = <ThrowOnError extends boolean = false>
  * List users in organization
  */
 export const usersOrganization = <ThrowOnError extends boolean = false>(options: Options<UsersOrganizationData, ThrowOnError>) => (options.client ?? client).get<UsersOrganizationResponses, UsersOrganizationErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/users',
     ...options
 });
@@ -114,7 +129,7 @@ export const usersOrganization = <ThrowOnError extends boolean = false>(options:
  * Add a user to the organization
  */
 export const addUserToOrganization = <ThrowOnError extends boolean = false>(options: Options<AddUserToOrganizationData, ThrowOnError>) => (options.client ?? client).post<AddUserToOrganizationResponses, AddUserToOrganizationErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/users',
     ...options,
     headers: {
@@ -127,7 +142,7 @@ export const addUserToOrganization = <ThrowOnError extends boolean = false>(opti
  * Delete a project
  */
 export const deleteProject = <ThrowOnError extends boolean = false>(options: Options<DeleteProjectData, ThrowOnError>) => (options.client ?? client).delete<DeleteProjectResponses, DeleteProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}',
     ...options
 });
@@ -136,7 +151,7 @@ export const deleteProject = <ThrowOnError extends boolean = false>(options: Opt
  * Get project by name
  */
 export const project = <ThrowOnError extends boolean = false>(options: Options<ProjectData, ThrowOnError>) => (options.client ?? client).get<ProjectResponses, ProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}',
     ...options
 });
@@ -145,7 +160,7 @@ export const project = <ThrowOnError extends boolean = false>(options: Options<P
  * Update project settings
  */
 export const updateProject = <ThrowOnError extends boolean = false>(options: Options<UpdateProjectData, ThrowOnError>) => (options.client ?? client).put<UpdateProjectResponses, UpdateProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}',
     ...options,
     headers: {
@@ -158,7 +173,7 @@ export const updateProject = <ThrowOnError extends boolean = false>(options: Opt
  * Get root branch of the project
  */
 export const rootBranch = <ThrowOnError extends boolean = false>(options: Options<RootBranchData, ThrowOnError>) => (options.client ?? client).get<RootBranchResponses, RootBranchErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/root-branch',
     ...options
 });
@@ -167,7 +182,7 @@ export const rootBranch = <ThrowOnError extends boolean = false>(options: Option
  * List all branches in the project
  */
 export const branches = <ThrowOnError extends boolean = false>(options: Options<BranchesData, ThrowOnError>) => (options.client ?? client).get<BranchesResponses, BranchesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches',
     ...options
 });
@@ -176,7 +191,7 @@ export const branches = <ThrowOnError extends boolean = false>(options: Options<
  * List users with access to the project
  */
 export const usersProject = <ThrowOnError extends boolean = false>(options: Options<UsersProjectData, ThrowOnError>) => (options.client ?? client).get<UsersProjectResponses, UsersProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/users',
     ...options
 });
@@ -185,7 +200,7 @@ export const usersProject = <ThrowOnError extends boolean = false>(options: Opti
  * Add a user to the project
  */
 export const addUserToProject = <ThrowOnError extends boolean = false>(options: Options<AddUserToProjectData, ThrowOnError>) => (options.client ?? client).post<AddUserToProjectResponses, AddUserToProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/users',
     ...options,
     headers: {
@@ -198,7 +213,7 @@ export const addUserToProject = <ThrowOnError extends boolean = false>(options: 
  * Remove a user from the project
  */
 export const removeUserFromProject = <ThrowOnError extends boolean = false>(options: Options<RemoveUserFromProjectData, ThrowOnError>) => (options.client ?? client).delete<RemoveUserFromProjectResponses, RemoveUserFromProjectErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/users/{userId}',
     ...options
 });
@@ -207,7 +222,7 @@ export const removeUserFromProject = <ThrowOnError extends boolean = false>(opti
  * Delete a non-root branch
  */
 export const deleteBranch = <ThrowOnError extends boolean = false>(options: Options<DeleteBranchData, ThrowOnError>) => (options.client ?? client).delete<DeleteBranchResponses, DeleteBranchErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}',
     ...options
 });
@@ -216,7 +231,7 @@ export const deleteBranch = <ThrowOnError extends boolean = false>(options: Opti
  * Get branch by name
  */
 export const branch = <ThrowOnError extends boolean = false>(options: Options<BranchData, ThrowOnError>) => (options.client ?? client).get<BranchResponses, BranchErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}',
     ...options
 });
@@ -225,7 +240,7 @@ export const branch = <ThrowOnError extends boolean = false>(options: Options<Br
  * Check if branch has uncommitted changes
  */
 export const branchTouched = <ThrowOnError extends boolean = false>(options: Options<BranchTouchedData, ThrowOnError>) => (options.client ?? client).get<BranchTouchedResponses, BranchTouchedErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/touched',
     ...options
 });
@@ -234,7 +249,7 @@ export const branchTouched = <ThrowOnError extends boolean = false>(options: Opt
  * Get parent branch (if created from another branch)
  */
 export const parentBranch = <ThrowOnError extends boolean = false>(options: Options<ParentBranchData, ThrowOnError>) => (options.client ?? client).get<ParentBranchResponses, ParentBranchErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/parent-branch',
     ...options
 });
@@ -243,7 +258,7 @@ export const parentBranch = <ThrowOnError extends boolean = false>(options: Opti
  * Get the first revision of the branch
  */
 export const startRevision = <ThrowOnError extends boolean = false>(options: Options<StartRevisionData, ThrowOnError>) => (options.client ?? client).get<StartRevisionResponses, StartRevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/start-revision',
     ...options
 });
@@ -252,7 +267,7 @@ export const startRevision = <ThrowOnError extends boolean = false>(options: Opt
  * Get the latest committed revision
  */
 export const headRevision = <ThrowOnError extends boolean = false>(options: Options<HeadRevisionData, ThrowOnError>) => (options.client ?? client).get<HeadRevisionResponses, HeadRevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/head-revision',
     ...options
 });
@@ -261,7 +276,7 @@ export const headRevision = <ThrowOnError extends boolean = false>(options: Opti
  * Get the draft (working) revision for modifications
  */
 export const draftRevision = <ThrowOnError extends boolean = false>(options: Options<DraftRevisionData, ThrowOnError>) => (options.client ?? client).get<DraftRevisionResponses, DraftRevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/draft-revision',
     ...options
 });
@@ -270,7 +285,7 @@ export const draftRevision = <ThrowOnError extends boolean = false>(options: Opt
  * List all revisions in the branch
  */
 export const revisions = <ThrowOnError extends boolean = false>(options: Options<RevisionsData, ThrowOnError>) => (options.client ?? client).get<RevisionsResponses, RevisionsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/revisions',
     ...options
 });
@@ -279,7 +294,7 @@ export const revisions = <ThrowOnError extends boolean = false>(options: Options
  * Commit changes and create a new revision
  */
 export const createRevision = <ThrowOnError extends boolean = false>(options: Options<CreateRevisionData, ThrowOnError>) => (options.client ?? client).post<CreateRevisionResponses, CreateRevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/create-revision',
     ...options,
     headers: {
@@ -292,7 +307,7 @@ export const createRevision = <ThrowOnError extends boolean = false>(options: Op
  * Discard all uncommitted changes
  */
 export const revertChanges = <ThrowOnError extends boolean = false>(options: Options<RevertChangesData, ThrowOnError>) => (options.client ?? client).post<RevertChangesResponses, RevertChangesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/organization/{organizationId}/projects/{projectName}/branches/{branchName}/revert-changes',
     ...options
 });
@@ -301,7 +316,7 @@ export const revertChanges = <ThrowOnError extends boolean = false>(options: Opt
  * Get revision by ID
  */
 export const revision = <ThrowOnError extends boolean = false>(options: Options<RevisionData, ThrowOnError>) => (options.client ?? client).get<RevisionResponses, RevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}',
     ...options
 });
@@ -310,7 +325,7 @@ export const revision = <ThrowOnError extends boolean = false>(options: Options<
  * Get parent revision
  */
 export const parentRevision = <ThrowOnError extends boolean = false>(options: Options<ParentRevisionData, ThrowOnError>) => (options.client ?? client).get<ParentRevisionResponses, ParentRevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/parent-revision',
     ...options
 });
@@ -319,7 +334,7 @@ export const parentRevision = <ThrowOnError extends boolean = false>(options: Op
  * Get child revision
  */
 export const childRevision = <ThrowOnError extends boolean = false>(options: Options<ChildRevisionData, ThrowOnError>) => (options.client ?? client).get<ChildRevisionResponses, ChildRevisionErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/child-revision',
     ...options
 });
@@ -328,7 +343,7 @@ export const childRevision = <ThrowOnError extends boolean = false>(options: Opt
  * List branches created from this revision
  */
 export const childBranches = <ThrowOnError extends boolean = false>(options: Options<ChildBranchesData, ThrowOnError>) => (options.client ?? client).get<ChildBranchesResponses, ChildBranchesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/child-branches',
     ...options
 });
@@ -337,7 +352,7 @@ export const childBranches = <ThrowOnError extends boolean = false>(options: Opt
  * Create a new branch from this revision
  */
 export const createBranch = <ThrowOnError extends boolean = false>(options: Options<CreateBranchData, ThrowOnError>) => (options.client ?? client).post<CreateBranchResponses, CreateBranchErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/child-branches',
     ...options,
     headers: {
@@ -350,7 +365,7 @@ export const createBranch = <ThrowOnError extends boolean = false>(options: Opti
  * List tables in revision
  */
 export const tables = <ThrowOnError extends boolean = false>(options: Options<TablesData, ThrowOnError>) => (options.client ?? client).get<TablesResponses, TablesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables',
     ...options
 });
@@ -359,7 +374,7 @@ export const tables = <ThrowOnError extends boolean = false>(options: Options<Ta
  * Create a new table
  */
 export const createTable = <ThrowOnError extends boolean = false>(options: Options<CreateTableData, ThrowOnError>) => (options.client ?? client).post<CreateTableResponses, CreateTableErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables',
     ...options,
     headers: {
@@ -372,7 +387,7 @@ export const createTable = <ThrowOnError extends boolean = false>(options: Optio
  * List API endpoints for this revision
  */
 export const endpoints = <ThrowOnError extends boolean = false>(options: Options<EndpointsData, ThrowOnError>) => (options.client ?? client).get<EndpointsResponses, EndpointsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/endpoints',
     ...options
 });
@@ -381,7 +396,7 @@ export const endpoints = <ThrowOnError extends boolean = false>(options: Options
  * Create an API endpoint for this revision
  */
 export const createEndpoint = <ThrowOnError extends boolean = false>(options: Options<CreateEndpointData, ThrowOnError>) => (options.client ?? client).post<CreateEndpointResponses, CreateEndpointErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/endpoints',
     ...options,
     headers: {
@@ -394,7 +409,7 @@ export const createEndpoint = <ThrowOnError extends boolean = false>(options: Op
  * Get schema migrations from this revision
  */
 export const migrations = <ThrowOnError extends boolean = false>(options: Options<MigrationsData, ThrowOnError>) => (options.client ?? client).get<MigrationsResponses, MigrationsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/migrations',
     ...options
 });
@@ -403,7 +418,7 @@ export const migrations = <ThrowOnError extends boolean = false>(options: Option
  * Get revision changes summary
  */
 export const revisionChanges = <ThrowOnError extends boolean = false>(options: Options<RevisionChangesData, ThrowOnError>) => (options.client ?? client).get<RevisionChangesResponses, RevisionChangesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/changes',
     ...options
 });
@@ -412,7 +427,7 @@ export const revisionChanges = <ThrowOnError extends boolean = false>(options: O
  * Get paginated table changes for a revision
  */
 export const tableChanges = <ThrowOnError extends boolean = false>(options: Options<TableChangesData, ThrowOnError>) => (options.client ?? client).get<TableChangesResponses, TableChangesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/table-changes',
     ...options
 });
@@ -421,7 +436,7 @@ export const tableChanges = <ThrowOnError extends boolean = false>(options: Opti
  * Get paginated row changes for a revision
  */
 export const rowChanges = <ThrowOnError extends boolean = false>(options: Options<RowChangesData, ThrowOnError>) => (options.client ?? client).get<RowChangesResponses, RowChangesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/row-changes',
     ...options
 });
@@ -430,7 +445,7 @@ export const rowChanges = <ThrowOnError extends boolean = false>(options: Option
  * Apply schema migrations to this revision
  */
 export const applyMigrations = <ThrowOnError extends boolean = false>(options: Options<ApplyMigrationsData, ThrowOnError>) => (options.client ?? client).post<ApplyMigrationsResponses, ApplyMigrationsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/apply-migrations',
     ...options,
     headers: {
@@ -443,7 +458,7 @@ export const applyMigrations = <ThrowOnError extends boolean = false>(options: O
  * Delete a table
  */
 export const deleteTable = <ThrowOnError extends boolean = false>(options: Options<DeleteTableData, ThrowOnError>) => (options.client ?? client).delete<DeleteTableResponses, DeleteTableErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}',
     ...options
 });
@@ -452,7 +467,7 @@ export const deleteTable = <ThrowOnError extends boolean = false>(options: Optio
  * Get table by ID
  */
 export const table = <ThrowOnError extends boolean = false>(options: Options<TableData, ThrowOnError>) => (options.client ?? client).get<TableResponses, TableErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}',
     ...options
 });
@@ -461,7 +476,7 @@ export const table = <ThrowOnError extends boolean = false>(options: Options<Tab
  * Update table schema using JSON Patch
  */
 export const updateTable = <ThrowOnError extends boolean = false>(options: Options<UpdateTableData, ThrowOnError>) => (options.client ?? client).patch<UpdateTableResponses, UpdateTableErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}',
     ...options,
     headers: {
@@ -474,7 +489,7 @@ export const updateTable = <ThrowOnError extends boolean = false>(options: Optio
  * Get row count in table
  */
 export const tableCountRows = <ThrowOnError extends boolean = false>(options: Options<TableCountRowsData, ThrowOnError>) => (options.client ?? client).get<TableCountRowsResponses, TableCountRowsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/count-rows',
     ...options
 });
@@ -483,7 +498,7 @@ export const tableCountRows = <ThrowOnError extends boolean = false>(options: Op
  * Delete multiple rows
  */
 export const deleteRows = <ThrowOnError extends boolean = false>(options: Options<DeleteRowsData, ThrowOnError>) => (options.client ?? client).delete<DeleteRowsResponses, DeleteRowsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows',
     ...options,
     headers: {
@@ -496,7 +511,7 @@ export const deleteRows = <ThrowOnError extends boolean = false>(options: Option
  * List rows in table with filtering and sorting
  */
 export const rows = <ThrowOnError extends boolean = false>(options: Options<RowsData, ThrowOnError>) => (options.client ?? client).post<RowsResponses, RowsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows',
     ...options,
     headers: {
@@ -509,7 +524,7 @@ export const rows = <ThrowOnError extends boolean = false>(options: Options<Rows
  * Create a new row
  */
 export const createRow = <ThrowOnError extends boolean = false>(options: Options<CreateRowData, ThrowOnError>) => (options.client ?? client).post<CreateRowResponses, CreateRowErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/create-row',
     ...options,
     headers: {
@@ -522,7 +537,7 @@ export const createRow = <ThrowOnError extends boolean = false>(options: Options
  * Create multiple rows
  */
 export const createRows = <ThrowOnError extends boolean = false>(options: Options<CreateRowsData, ThrowOnError>) => (options.client ?? client).post<CreateRowsResponses, CreateRowsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/create-rows',
     ...options,
     headers: {
@@ -535,7 +550,7 @@ export const createRows = <ThrowOnError extends boolean = false>(options: Option
  * Replace data for multiple rows
  */
 export const updateRows = <ThrowOnError extends boolean = false>(options: Options<UpdateRowsData, ThrowOnError>) => (options.client ?? client).put<UpdateRowsResponses, UpdateRowsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/update-rows',
     ...options,
     headers: {
@@ -548,7 +563,7 @@ export const updateRows = <ThrowOnError extends boolean = false>(options: Option
  * Patch multiple rows using JSON Patch
  */
 export const patchRows = <ThrowOnError extends boolean = false>(options: Options<PatchRowsData, ThrowOnError>) => (options.client ?? client).patch<PatchRowsResponses, PatchRowsErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/patch-rows',
     ...options,
     headers: {
@@ -561,7 +576,7 @@ export const patchRows = <ThrowOnError extends boolean = false>(options: Options
  * Get table JSON Schema
  */
 export const tableSchema = <ThrowOnError extends boolean = false>(options: Options<TableSchemaData, ThrowOnError>) => (options.client ?? client).get<TableSchemaResponses, TableSchemaErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/schema',
     ...options
 });
@@ -570,7 +585,7 @@ export const tableSchema = <ThrowOnError extends boolean = false>(options: Optio
  * Count tables that reference this table
  */
 export const tableCountForeignKeysBy = <ThrowOnError extends boolean = false>(options: Options<TableCountForeignKeysByData, ThrowOnError>) => (options.client ?? client).get<TableCountForeignKeysByResponses, TableCountForeignKeysByErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/count-foreign-keys-by',
     ...options
 });
@@ -579,7 +594,7 @@ export const tableCountForeignKeysBy = <ThrowOnError extends boolean = false>(op
  * List tables that reference this table
  */
 export const tableForeignKeysBy = <ThrowOnError extends boolean = false>(options: Options<TableForeignKeysByData, ThrowOnError>) => (options.client ?? client).get<TableForeignKeysByResponses, TableForeignKeysByErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/foreign-keys-by',
     ...options
 });
@@ -588,7 +603,7 @@ export const tableForeignKeysBy = <ThrowOnError extends boolean = false>(options
  * Count tables this table references
  */
 export const tableCountForeignKeysTo = <ThrowOnError extends boolean = false>(options: Options<TableCountForeignKeysToData, ThrowOnError>) => (options.client ?? client).get<TableCountForeignKeysToResponses, TableCountForeignKeysToErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/count-foreign-keys-to',
     ...options
 });
@@ -597,7 +612,7 @@ export const tableCountForeignKeysTo = <ThrowOnError extends boolean = false>(op
  * List tables this table references
  */
 export const tableForeignKeysTo = <ThrowOnError extends boolean = false>(options: Options<TableForeignKeysToData, ThrowOnError>) => (options.client ?? client).get<TableForeignKeysToResponses, TableForeignKeysToErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/foreign-keys-to',
     ...options
 });
@@ -606,7 +621,7 @@ export const tableForeignKeysTo = <ThrowOnError extends boolean = false>(options
  * Rename a table
  */
 export const renameTable = <ThrowOnError extends boolean = false>(options: Options<RenameTableData, ThrowOnError>) => (options.client ?? client).patch<RenameTableResponses, RenameTableErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rename',
     ...options,
     headers: {
@@ -619,7 +634,7 @@ export const renameTable = <ThrowOnError extends boolean = false>(options: Optio
  * Delete a row
  */
 export const deleteRow = <ThrowOnError extends boolean = false>(options: Options<DeleteRowData, ThrowOnError>) => (options.client ?? client).delete<DeleteRowResponses, DeleteRowErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}',
     ...options
 });
@@ -628,7 +643,7 @@ export const deleteRow = <ThrowOnError extends boolean = false>(options: Options
  * Get row by ID
  */
 export const row = <ThrowOnError extends boolean = false>(options: Options<RowData, ThrowOnError>) => (options.client ?? client).get<RowResponses, RowErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}',
     ...options
 });
@@ -637,7 +652,7 @@ export const row = <ThrowOnError extends boolean = false>(options: Options<RowDa
  * Patch row data using JSON Patch
  */
 export const patchRow = <ThrowOnError extends boolean = false>(options: Options<PatchRowData, ThrowOnError>) => (options.client ?? client).patch<PatchRowResponses, PatchRowErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}',
     ...options,
     headers: {
@@ -650,7 +665,7 @@ export const patchRow = <ThrowOnError extends boolean = false>(options: Options<
  * Replace row data
  */
 export const updateRow = <ThrowOnError extends boolean = false>(options: Options<UpdateRowData, ThrowOnError>) => (options.client ?? client).put<UpdateRowResponses, UpdateRowErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}',
     ...options,
     headers: {
@@ -663,7 +678,7 @@ export const updateRow = <ThrowOnError extends boolean = false>(options: Options
  * Count rows that reference this row
  */
 export const rowCountForeignKeysBy = <ThrowOnError extends boolean = false>(options: Options<RowCountForeignKeysByData, ThrowOnError>) => (options.client ?? client).get<RowCountForeignKeysByResponses, RowCountForeignKeysByErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}/count-foreign-keys-by',
     ...options
 });
@@ -672,7 +687,7 @@ export const rowCountForeignKeysBy = <ThrowOnError extends boolean = false>(opti
  * List rows that reference this row
  */
 export const rowForeignKeysBy = <ThrowOnError extends boolean = false>(options: Options<RowForeignKeysByData, ThrowOnError>) => (options.client ?? client).get<RowForeignKeysByResponses, RowForeignKeysByErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}/foreign-keys-by',
     ...options
 });
@@ -681,7 +696,7 @@ export const rowForeignKeysBy = <ThrowOnError extends boolean = false>(options: 
  * Count rows this row references
  */
 export const rowCountForeignKeysTo = <ThrowOnError extends boolean = false>(options: Options<RowCountForeignKeysToData, ThrowOnError>) => (options.client ?? client).get<RowCountForeignKeysToResponses, RowCountForeignKeysToErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}/count-foreign-keys-to',
     ...options
 });
@@ -690,7 +705,7 @@ export const rowCountForeignKeysTo = <ThrowOnError extends boolean = false>(opti
  * List rows this row references
  */
 export const rowForeignKeysTo = <ThrowOnError extends boolean = false>(options: Options<RowForeignKeysToData, ThrowOnError>) => (options.client ?? client).get<RowForeignKeysToResponses, RowForeignKeysToErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}/foreign-keys-to',
     ...options
 });
@@ -699,7 +714,7 @@ export const rowForeignKeysTo = <ThrowOnError extends boolean = false>(options: 
  * Rename a row
  */
 export const renameRow = <ThrowOnError extends boolean = false>(options: Options<RenameRowData, ThrowOnError>) => (options.client ?? client).patch<RenameRowResponses, RenameRowErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}/rename',
     ...options,
     headers: {
@@ -713,7 +728,7 @@ export const renameRow = <ThrowOnError extends boolean = false>(options: Options
  */
 export const uploadFile = <ThrowOnError extends boolean = false>(options: Options<UploadFileData, ThrowOnError>) => (options.client ?? client).post<UploadFileResponses, UploadFileErrors, ThrowOnError>({
     ...formDataBodySerializer,
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/revision/{revisionId}/tables/{tableId}/rows/{rowId}/upload/{fileId}',
     ...options,
     headers: {
@@ -726,7 +741,7 @@ export const uploadFile = <ThrowOnError extends boolean = false>(options: Option
  * Get endpoint with all related entities
  */
 export const endpointRelatives = <ThrowOnError extends boolean = false>(options: Options<EndpointRelativesData, ThrowOnError>) => (options.client ?? client).get<EndpointRelativesResponses, EndpointRelativesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/endpoints/{endpointId}/relatives',
     ...options
 });
@@ -735,7 +750,7 @@ export const endpointRelatives = <ThrowOnError extends boolean = false>(options:
  * Delete an endpoint
  */
 export const deleteEndpoint = <ThrowOnError extends boolean = false>(options: Options<DeleteEndpointData, ThrowOnError>) => (options.client ?? client).delete<DeleteEndpointResponses, DeleteEndpointErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
     url: '/api/endpoints/{endpointId}',
     ...options
 });
@@ -748,3 +763,7 @@ export const getConfiguration = <ThrowOnError extends boolean = false>(options?:
 export const readiness = <ThrowOnError extends boolean = false>(options?: Options<ReadinessData, ThrowOnError>) => (options?.client ?? client).get<ReadinessResponses, ReadinessErrors, ThrowOnError>({ url: '/health/readiness', ...options });
 
 export const liveness = <ThrowOnError extends boolean = false>(options?: Options<LivenessData, ThrowOnError>) => (options?.client ?? client).get<LivenessResponses, LivenessErrors, ThrowOnError>({ url: '/health/liveness', ...options });
+
+export const storageControllerGetFile = <ThrowOnError extends boolean = false>(options: Options<StorageControllerGetFileData, ThrowOnError>) => (options.client ?? client).get<StorageControllerGetFileResponses, unknown, ThrowOnError>({ url: '/files/{key}', ...options });
+
+export const billingCallbackControllerHandleCallback = <ThrowOnError extends boolean = false>(options: Options<BillingCallbackControllerHandleCallbackData, ThrowOnError>) => (options.client ?? client).post<BillingCallbackControllerHandleCallbackResponses, unknown, ThrowOnError>({ url: '/billing/payment-callback', ...options });

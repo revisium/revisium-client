@@ -47,11 +47,11 @@
     "test:integration:down": "if [ -f .revisium-test.pid ]; then kill $(cat .revisium-test.pid) 2>/dev/null; rm -f .revisium-test.pid; fi; rm -rf .revisium-test",
     "lint:ci": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\" \"specs/**/*.json\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"specs/**/*.json\"",
     "tsc": "tsc --noEmit",
     "generate": "openapi-ts",
-    "generate:download": "curl -o specs/openapi.json https://cloud.dev.revisium.io/api-json && npm run generate",
+    "generate:download": "curl -o specs/openapi.json https://cloud.dev.revisium.io/api-json && prettier --write specs/openapi.json && npm run generate",
     "prepublishOnly": "npm run build && npm run tsc"
   },
   "devDependencies": {
