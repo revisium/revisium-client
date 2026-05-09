@@ -21,7 +21,9 @@ describe('SDK Integration', () => {
 
     expect(result.error).toBeUndefined();
     token = result.data!.accessToken;
-    testClient.setConfig({ auth: token });
+    testClient.setConfig({
+      auth: ({ scheme }) => (scheme === 'bearer' ? token : undefined),
+    });
 
     const createResult = await sdk.createProject({
       client: testClient,
