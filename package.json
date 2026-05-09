@@ -58,7 +58,7 @@
     "@eslint/js": "^9.15.0",
     "@hey-api/openapi-ts": "^0.92.3",
     "@jest/globals": "^29.7.0",
-    "@revisium/standalone": "2.6.0",
+    "@revisium/standalone": "2.8.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^24.10.7",
     "eslint": "^9.15.0",
