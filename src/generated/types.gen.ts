@@ -1131,6 +1131,72 @@ export type ConfigurationResponse = {
     github: GithubOauth;
 };
 
+export type CreatePersonalApiKeyDto = {
+    projectIds?: Array<string>;
+    branchNames?: Array<string>;
+    tableIds?: Array<string>;
+    readOnly?: boolean;
+    allowedIps?: Array<string>;
+    expiresAt?: string;
+    name: string;
+    organizationId?: string;
+};
+
+export type ApiKeyType = 'PERSONAL' | 'SERVICE' | 'INTERNAL';
+
+export type ApiKeyModel = {
+    id: string;
+    prefix: string;
+    type: ApiKeyType;
+    name: string;
+    organizationId?: string | null;
+    projectIds: Array<string>;
+    branchNames: Array<string>;
+    tableIds: Array<string>;
+    readOnly: boolean;
+    allowedIps: Array<string>;
+    permissions: {
+        [key: string]: unknown;
+    } | null;
+    expiresAt?: string | null;
+    lastUsedAt?: string | null;
+    createdAt: string;
+    revokedAt?: string | null;
+};
+
+export type ApiKeyWithSecretModel = {
+    apiKey: ApiKeyModel;
+    /**
+     * Plaintext secret. Returned only once at creation/rotation — store it now or rotate.
+     */
+    secret: string;
+};
+
+export type CaslRuleDto = {
+    action: Array<string>;
+    subject: Array<string>;
+    conditions?: {
+        [key: string]: unknown;
+    };
+    fields?: Array<string>;
+    inverted?: boolean;
+};
+
+export type CaslPermissionsDto = {
+    rules: Array<CaslRuleDto>;
+};
+
+export type CreateServiceApiKeyDto = {
+    projectIds?: Array<string>;
+    branchNames?: Array<string>;
+    tableIds?: Array<string>;
+    readOnly?: boolean;
+    allowedIps?: Array<string>;
+    expiresAt?: string;
+    name: string;
+    permissions: CaslPermissionsDto;
+};
+
 export type LoginData = {
     body: LoginDto;
     path?: never;
@@ -4212,6 +4278,241 @@ export type GetConfigurationResponses = {
 };
 
 export type GetConfigurationResponse = GetConfigurationResponses[keyof GetConfigurationResponses];
+
+export type MyApiKeysData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/api-keys/personal';
+};
+
+export type MyApiKeysErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type MyApiKeysError = MyApiKeysErrors[keyof MyApiKeysErrors];
+
+export type MyApiKeysResponses = {
+    200: Array<ApiKeyModel>;
+};
+
+export type MyApiKeysResponse = MyApiKeysResponses[keyof MyApiKeysResponses];
+
+export type CreatePersonalApiKeyData = {
+    body: CreatePersonalApiKeyDto;
+    path?: never;
+    query?: never;
+    url: '/api/api-keys/personal';
+};
+
+export type CreatePersonalApiKeyErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type CreatePersonalApiKeyError = CreatePersonalApiKeyErrors[keyof CreatePersonalApiKeyErrors];
+
+export type CreatePersonalApiKeyResponses = {
+    201: ApiKeyWithSecretModel;
+};
+
+export type CreatePersonalApiKeyResponse = CreatePersonalApiKeyResponses[keyof CreatePersonalApiKeyResponses];
+
+export type ApiKeyByIdData = {
+    body?: never;
+    path: {
+        /**
+         * API key identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/api-keys/{id}';
+};
+
+export type ApiKeyByIdErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type ApiKeyByIdError = ApiKeyByIdErrors[keyof ApiKeyByIdErrors];
+
+export type ApiKeyByIdResponses = {
+    200: ApiKeyModel;
+};
+
+export type ApiKeyByIdResponse = ApiKeyByIdResponses[keyof ApiKeyByIdResponses];
+
+export type RotateApiKeyData = {
+    body?: never;
+    path: {
+        /**
+         * API key identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/api-keys/{id}/rotate';
+};
+
+export type RotateApiKeyErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type RotateApiKeyError = RotateApiKeyErrors[keyof RotateApiKeyErrors];
+
+export type RotateApiKeyResponses = {
+    201: ApiKeyWithSecretModel;
+};
+
+export type RotateApiKeyResponse = RotateApiKeyResponses[keyof RotateApiKeyResponses];
+
+export type RevokeApiKeyData = {
+    body?: never;
+    path: {
+        /**
+         * API key identifier
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/api/api-keys/{id}/revoke';
+};
+
+export type RevokeApiKeyErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type RevokeApiKeyError = RevokeApiKeyErrors[keyof RevokeApiKeyErrors];
+
+export type RevokeApiKeyResponses = {
+    200: ApiKeyModel;
+};
+
+export type RevokeApiKeyResponse = RevokeApiKeyResponses[keyof RevokeApiKeyResponses];
+
+export type ServiceApiKeysData = {
+    body?: never;
+    path: {
+        /**
+         * Organization identifier (typically the owner username)
+         */
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/organization/{organizationId}/api-keys/service';
+};
+
+export type ServiceApiKeysErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type ServiceApiKeysError = ServiceApiKeysErrors[keyof ServiceApiKeysErrors];
+
+export type ServiceApiKeysResponses = {
+    200: Array<ApiKeyModel>;
+};
+
+export type ServiceApiKeysResponse = ServiceApiKeysResponses[keyof ServiceApiKeysResponses];
+
+export type CreateServiceApiKeyData = {
+    body: CreateServiceApiKeyDto;
+    path: {
+        /**
+         * Organization identifier (typically the owner username)
+         */
+        organizationId: string;
+    };
+    query?: never;
+    url: '/api/organization/{organizationId}/api-keys/service';
+};
+
+export type CreateServiceApiKeyErrors = {
+    /**
+     * Invalid request data or validation failed
+     */
+    400: ErrorModel;
+    /**
+     * Authentication required. Provide a valid JWT token.
+     */
+    401: ErrorModel;
+    /**
+     * Insufficient permissions for this operation
+     */
+    403: ErrorModel;
+};
+
+export type CreateServiceApiKeyError = CreateServiceApiKeyErrors[keyof CreateServiceApiKeyErrors];
+
+export type CreateServiceApiKeyResponses = {
+    201: ApiKeyWithSecretModel;
+};
+
+export type CreateServiceApiKeyResponse = CreateServiceApiKeyResponses[keyof CreateServiceApiKeyResponses];
 
 export type ReadinessData = {
     body?: never;

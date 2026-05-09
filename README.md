@@ -73,8 +73,20 @@ client.loginWithToken('jwt-token');
 #### API Key (recommended for programmatic access)
 
 ```typescript
-client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxx');
+client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxxxx');
 // Sends X-Api-Key header on all requests
+```
+
+`loginWithApiKey` validates the core API-key format (`rev_` plus 22 base64url
+characters). `X-Api-Key` is the default and recommended transport.
+
+```typescript
+// Default: X-Api-Key: rev_...
+client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxxxx');
+
+// Also supported by core auth:
+client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxxxx', { transport: 'bearer' });
+client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxxxx', { transport: 'query' });
 ```
 
 #### Common
@@ -82,6 +94,46 @@ client.loginWithApiKey('rev_xxxxxxxxxxxxxxxxxxxx');
 ```typescript
 client.isAuthenticated(); // boolean
 const user = await client.me(); // { id, username, email, hasPassword }
+```
+
+### API Key Management
+
+```typescript
+await client.login('admin', 'admin');
+
+const personalKey = await client.createPersonalApiKey({
+  name: 'CI/CD',
+  organizationId: 'admin',
+  projectIds: ['my-project'],
+  branchNames: ['master'],
+  readOnly: true,
+});
+
+// Store personalKey.secret in a secure secret manager; it is returned only when created or rotated.
+
+const keys = await client.getMyApiKeys();
+const rotated = await client.rotateApiKey(personalKey.apiKey.id);
+await client.revokeApiKey(rotated.apiKey.id);
+```
+
+Service keys are organization-scoped and require the caller to have
+`manage-api-key`.
+
+```typescript
+const serviceKey = await client.createServiceApiKey({
+  name: 'Endpoint worker',
+  organizationId: 'admin',
+  projectIds: ['my-project'],
+  branchNames: ['master'],
+  tableIds: ['posts'],
+  readOnly: true,
+  permissions: {
+    rules: [{ action: ['read'], subject: ['Row'] }],
+  },
+});
+
+const serviceKeys = await client.getServiceApiKeys('admin');
+const key = await client.getApiKeyById(serviceKey.apiKey.id);
 ```
 
 ### Scope Hierarchy
@@ -355,6 +407,16 @@ const result = await sdk.projects({
 });
 ```
 
+For API keys on the low-level REST SDK, set the header explicitly so the
+generated bearer auth handler does not also add `Authorization`.
+
+```typescript
+const myClient = createClient(createConfig({
+  baseUrl: 'https://my-revisium.example.com',
+  headers: { 'X-Api-Key': 'rev_xxxxxxxxxxxxxxxxxxxxxx' },
+}));
+```
+
 ## Available Low-Level Functions
 
 ### Auth
@@ -365,6 +427,20 @@ const result = await sdk.projects({
 | `me` | GET | Get current user |
 | `createUser` | POST | Create user (admin) |
 | `updatePassword` | PUT | Update password |
+
+### API Keys
+
+High-level API key management methods call generated REST endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `createPersonalApiKey` | `POST /api/api-keys/personal` | Create a personal key for the current user |
+| `getMyApiKeys` | `GET /api/api-keys/personal` | List the current user's personal keys |
+| `getApiKeyById` | `GET /api/api-keys/{id}` | Read key metadata by ID |
+| `rotateApiKey` | `POST /api/api-keys/{id}/rotate` | Rotate a key and return the new secret |
+| `revokeApiKey` | `POST /api/api-keys/{id}/revoke` | Revoke a key |
+| `createServiceApiKey` | `POST /api/organization/{organizationId}/api-keys/service` | Create an organization service key |
+| `getServiceApiKeys` | `GET /api/organization/{organizationId}/api-keys/service` | List service keys for an organization |
 
 ### Projects
 

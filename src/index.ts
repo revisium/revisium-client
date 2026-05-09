@@ -4,6 +4,23 @@ export type {
   BranchShortcut,
   RevisionShortcut,
 } from './revisium-client.js';
+export {
+  API_KEY_PATTERN,
+  assertValidApiKey,
+  isValidApiKey,
+} from './api-keys.js';
+export type {
+  ApiKeyAuthOptions,
+  ApiKeyModel,
+  ApiKeyTransport,
+  ApiKeyType,
+  ApiKeyWithSecret,
+  BaseApiKeyScopeInput,
+  CaslPermissions,
+  CaslRule,
+  CreatePersonalApiKeyInput,
+  CreateServiceApiKeyInput,
+} from './api-keys.js';
 
 export { OrgScope } from './org-scope.js';
 export { ProjectScope } from './project-scope.js';

@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddUserToOrganizationData, AddUserToOrganizationErrors, AddUserToOrganizationResponses, AddUserToProjectData, AddUserToProjectErrors, AddUserToProjectResponses, ApplyMigrationsData, ApplyMigrationsErrors, ApplyMigrationsResponses, BillingCallbackControllerHandleCallbackData, BillingCallbackControllerHandleCallbackResponses, BranchData, BranchErrors, BranchesData, BranchesErrors, BranchesResponses, BranchResponses, BranchTouchedData, BranchTouchedErrors, BranchTouchedResponses, ChildBranchesData, ChildBranchesErrors, ChildBranchesResponses, ChildRevisionData, ChildRevisionErrors, ChildRevisionResponses, CreateBranchData, CreateBranchErrors, CreateBranchResponses, CreateEndpointData, CreateEndpointErrors, CreateEndpointResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateRevisionData, CreateRevisionErrors, CreateRevisionResponses, CreateRowData, CreateRowErrors, CreateRowResponses, CreateRowsData, CreateRowsErrors, CreateRowsResponses, CreateTableData, CreateTableErrors, CreateTableResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteBranchData, DeleteBranchErrors, DeleteBranchResponses, DeleteEndpointData, DeleteEndpointErrors, DeleteEndpointResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteRowData, DeleteRowErrors, DeleteRowResponses, DeleteRowsData, DeleteRowsErrors, DeleteRowsResponses, DeleteTableData, DeleteTableErrors, DeleteTableResponses, DraftRevisionData, DraftRevisionErrors, DraftRevisionResponses, EndpointRelativesData, EndpointRelativesErrors, EndpointRelativesResponses, EndpointsData, EndpointsErrors, EndpointsResponses, GetConfigurationData, GetConfigurationResponses, HeadRevisionData, HeadRevisionErrors, HeadRevisionResponses, LivenessData, LivenessErrors, LivenessResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, MeData, MeErrors, MeResponses, MigrationsData, MigrationsErrors, MigrationsResponses, ParentBranchData, ParentBranchErrors, ParentBranchResponses, ParentRevisionData, ParentRevisionErrors, ParentRevisionResponses, PatchRowData, PatchRowErrors, PatchRowResponses, PatchRowsData, PatchRowsErrors, PatchRowsResponses, ProjectData, ProjectErrors, ProjectResponses, ProjectsData, ProjectsErrors, ProjectsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RefreshData, RefreshErrors, RefreshResponses, RemoveUserFromOrganizationData, RemoveUserFromOrganizationErrors, RemoveUserFromOrganizationResponses, RemoveUserFromProjectData, RemoveUserFromProjectErrors, RemoveUserFromProjectResponses, RenameRowData, RenameRowErrors, RenameRowResponses, RenameTableData, RenameTableErrors, RenameTableResponses, RevertChangesData, RevertChangesErrors, RevertChangesResponses, RevisionChangesData, RevisionChangesErrors, RevisionChangesResponses, RevisionData, RevisionErrors, RevisionResponses, RevisionsData, RevisionsErrors, RevisionsResponses, RootBranchData, RootBranchErrors, RootBranchResponses, RowChangesData, RowChangesErrors, RowChangesResponses, RowCountForeignKeysByData, RowCountForeignKeysByErrors, RowCountForeignKeysByResponses, RowCountForeignKeysToData, RowCountForeignKeysToErrors, RowCountForeignKeysToResponses, RowData, RowErrors, RowForeignKeysByData, RowForeignKeysByErrors, RowForeignKeysByResponses, RowForeignKeysToData, RowForeignKeysToErrors, RowForeignKeysToResponses, RowResponses, RowsData, RowsErrors, RowsResponses, StartRevisionData, StartRevisionErrors, StartRevisionResponses, StorageControllerGetFileData, StorageControllerGetFileResponses, TableChangesData, TableChangesErrors, TableChangesResponses, TableCountForeignKeysByData, TableCountForeignKeysByErrors, TableCountForeignKeysByResponses, TableCountForeignKeysToData, TableCountForeignKeysToErrors, TableCountForeignKeysToResponses, TableCountRowsData, TableCountRowsErrors, TableCountRowsResponses, TableData, TableErrors, TableForeignKeysByData, TableForeignKeysByErrors, TableForeignKeysByResponses, TableForeignKeysToData, TableForeignKeysToErrors, TableForeignKeysToResponses, TableResponses, TableSchemaData, TableSchemaErrors, TableSchemaResponses, TablesData, TablesErrors, TablesResponses, UpdatePasswordData, UpdatePasswordErrors, UpdatePasswordResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateRowData, UpdateRowErrors, UpdateRowResponses, UpdateRowsData, UpdateRowsErrors, UpdateRowsResponses, UpdateTableData, UpdateTableErrors, UpdateTableResponses, UploadFileData, UploadFileErrors, UploadFileResponses, UsersOrganizationData, UsersOrganizationErrors, UsersOrganizationResponses, UsersProjectData, UsersProjectErrors, UsersProjectResponses } from './types.gen';
+import type { AddUserToOrganizationData, AddUserToOrganizationErrors, AddUserToOrganizationResponses, AddUserToProjectData, AddUserToProjectErrors, AddUserToProjectResponses, ApiKeyByIdData, ApiKeyByIdErrors, ApiKeyByIdResponses, ApplyMigrationsData, ApplyMigrationsErrors, ApplyMigrationsResponses, BillingCallbackControllerHandleCallbackData, BillingCallbackControllerHandleCallbackResponses, BranchData, BranchErrors, BranchesData, BranchesErrors, BranchesResponses, BranchResponses, BranchTouchedData, BranchTouchedErrors, BranchTouchedResponses, ChildBranchesData, ChildBranchesErrors, ChildBranchesResponses, ChildRevisionData, ChildRevisionErrors, ChildRevisionResponses, CreateBranchData, CreateBranchErrors, CreateBranchResponses, CreateEndpointData, CreateEndpointErrors, CreateEndpointResponses, CreatePersonalApiKeyData, CreatePersonalApiKeyErrors, CreatePersonalApiKeyResponses, CreateProjectData, CreateProjectErrors, CreateProjectResponses, CreateRevisionData, CreateRevisionErrors, CreateRevisionResponses, CreateRowData, CreateRowErrors, CreateRowResponses, CreateRowsData, CreateRowsErrors, CreateRowsResponses, CreateServiceApiKeyData, CreateServiceApiKeyErrors, CreateServiceApiKeyResponses, CreateTableData, CreateTableErrors, CreateTableResponses, CreateUserData, CreateUserErrors, CreateUserResponses, DeleteBranchData, DeleteBranchErrors, DeleteBranchResponses, DeleteEndpointData, DeleteEndpointErrors, DeleteEndpointResponses, DeleteProjectData, DeleteProjectErrors, DeleteProjectResponses, DeleteRowData, DeleteRowErrors, DeleteRowResponses, DeleteRowsData, DeleteRowsErrors, DeleteRowsResponses, DeleteTableData, DeleteTableErrors, DeleteTableResponses, DraftRevisionData, DraftRevisionErrors, DraftRevisionResponses, EndpointRelativesData, EndpointRelativesErrors, EndpointRelativesResponses, EndpointsData, EndpointsErrors, EndpointsResponses, GetConfigurationData, GetConfigurationResponses, HeadRevisionData, HeadRevisionErrors, HeadRevisionResponses, LivenessData, LivenessErrors, LivenessResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, MeData, MeErrors, MeResponses, MigrationsData, MigrationsErrors, MigrationsResponses, MyApiKeysData, MyApiKeysErrors, MyApiKeysResponses, ParentBranchData, ParentBranchErrors, ParentBranchResponses, ParentRevisionData, ParentRevisionErrors, ParentRevisionResponses, PatchRowData, PatchRowErrors, PatchRowResponses, PatchRowsData, PatchRowsErrors, PatchRowsResponses, ProjectData, ProjectErrors, ProjectResponses, ProjectsData, ProjectsErrors, ProjectsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RefreshData, RefreshErrors, RefreshResponses, RemoveUserFromOrganizationData, RemoveUserFromOrganizationErrors, RemoveUserFromOrganizationResponses, RemoveUserFromProjectData, RemoveUserFromProjectErrors, RemoveUserFromProjectResponses, RenameRowData, RenameRowErrors, RenameRowResponses, RenameTableData, RenameTableErrors, RenameTableResponses, RevertChangesData, RevertChangesErrors, RevertChangesResponses, RevisionChangesData, RevisionChangesErrors, RevisionChangesResponses, RevisionData, RevisionErrors, RevisionResponses, RevisionsData, RevisionsErrors, RevisionsResponses, RevokeApiKeyData, RevokeApiKeyErrors, RevokeApiKeyResponses, RootBranchData, RootBranchErrors, RootBranchResponses, RotateApiKeyData, RotateApiKeyErrors, RotateApiKeyResponses, RowChangesData, RowChangesErrors, RowChangesResponses, RowCountForeignKeysByData, RowCountForeignKeysByErrors, RowCountForeignKeysByResponses, RowCountForeignKeysToData, RowCountForeignKeysToErrors, RowCountForeignKeysToResponses, RowData, RowErrors, RowForeignKeysByData, RowForeignKeysByErrors, RowForeignKeysByResponses, RowForeignKeysToData, RowForeignKeysToErrors, RowForeignKeysToResponses, RowResponses, RowsData, RowsErrors, RowsResponses, ServiceApiKeysData, ServiceApiKeysErrors, ServiceApiKeysResponses, StartRevisionData, StartRevisionErrors, StartRevisionResponses, StorageControllerGetFileData, StorageControllerGetFileResponses, TableChangesData, TableChangesErrors, TableChangesResponses, TableCountForeignKeysByData, TableCountForeignKeysByErrors, TableCountForeignKeysByResponses, TableCountForeignKeysToData, TableCountForeignKeysToErrors, TableCountForeignKeysToResponses, TableCountRowsData, TableCountRowsErrors, TableCountRowsResponses, TableData, TableErrors, TableForeignKeysByData, TableForeignKeysByErrors, TableForeignKeysByResponses, TableForeignKeysToData, TableForeignKeysToErrors, TableForeignKeysToResponses, TableResponses, TableSchemaData, TableSchemaErrors, TableSchemaResponses, TablesData, TablesErrors, TablesResponses, UpdatePasswordData, UpdatePasswordErrors, UpdatePasswordResponses, UpdateProjectData, UpdateProjectErrors, UpdateProjectResponses, UpdateRowData, UpdateRowErrors, UpdateRowResponses, UpdateRowsData, UpdateRowsErrors, UpdateRowsResponses, UpdateTableData, UpdateTableErrors, UpdateTableResponses, UploadFileData, UploadFileErrors, UploadFileResponses, UsersOrganizationData, UsersOrganizationErrors, UsersOrganizationResponses, UsersProjectData, UsersProjectErrors, UsersProjectResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -759,6 +759,87 @@ export const deleteEndpoint = <ThrowOnError extends boolean = false>(options: Op
  * Get system configuration
  */
 export const getConfiguration = <ThrowOnError extends boolean = false>(options?: Options<GetConfigurationData, ThrowOnError>) => (options?.client ?? client).get<GetConfigurationResponses, unknown, ThrowOnError>({ url: '/api/configuration', ...options });
+
+/**
+ * List the current user's personal API keys
+ */
+export const myApiKeys = <ThrowOnError extends boolean = false>(options?: Options<MyApiKeysData, ThrowOnError>) => (options?.client ?? client).get<MyApiKeysResponses, MyApiKeysErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/api-keys/personal',
+    ...options
+});
+
+/**
+ * Create a personal API key for the current user
+ *
+ * Returns the plaintext secret only on this response. Store it now — it cannot be retrieved later.
+ */
+export const createPersonalApiKey = <ThrowOnError extends boolean = false>(options: Options<CreatePersonalApiKeyData, ThrowOnError>) => (options.client ?? client).post<CreatePersonalApiKeyResponses, CreatePersonalApiKeyErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/api-keys/personal',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Read one API key visible to the current user
+ */
+export const apiKeyById = <ThrowOnError extends boolean = false>(options: Options<ApiKeyByIdData, ThrowOnError>) => (options.client ?? client).get<ApiKeyByIdResponses, ApiKeyByIdErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/api-keys/{id}',
+    ...options
+});
+
+/**
+ * Rotate a key — revokes the original and returns a new secret
+ *
+ * Atomically revokes the original key and creates a replacement with the same scope. The new plaintext secret is returned only on this response.
+ */
+export const rotateApiKey = <ThrowOnError extends boolean = false>(options: Options<RotateApiKeyData, ThrowOnError>) => (options.client ?? client).post<RotateApiKeyResponses, RotateApiKeyErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/api-keys/{id}/rotate',
+    ...options
+});
+
+/**
+ * Revoke a key
+ *
+ * Sets `revokedAt` on the key. The record is preserved for audit; subsequent authentication attempts with this key are rejected.
+ */
+export const revokeApiKey = <ThrowOnError extends boolean = false>(options: Options<RevokeApiKeyData, ThrowOnError>) => (options.client ?? client).post<RevokeApiKeyResponses, RevokeApiKeyErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/api-keys/{id}/revoke',
+    ...options
+});
+
+/**
+ * List organization service API keys
+ *
+ * Requires `manage` on `ApiKey` for the organization.
+ */
+export const serviceApiKeys = <ThrowOnError extends boolean = false>(options: Options<ServiceApiKeysData, ThrowOnError>) => (options.client ?? client).get<ServiceApiKeysResponses, ServiceApiKeysErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/organization/{organizationId}/api-keys/service',
+    ...options
+});
+
+/**
+ * Create a service API key for an organization
+ *
+ * Requires `manage` on `ApiKey` for the organization (scoped further to projects when `projectIds` is supplied). The plaintext secret is returned only on this response.
+ */
+export const createServiceApiKey = <ThrowOnError extends boolean = false>(options: Options<CreateServiceApiKeyData, ThrowOnError>) => (options.client ?? client).post<CreateServiceApiKeyResponses, CreateServiceApiKeyErrors, ThrowOnError>({
+    security: [{ name: 'X-Api-Key', type: 'apiKey' }, { scheme: 'bearer', type: 'http' }],
+    url: '/api/organization/{organizationId}/api-keys/service',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 export const readiness = <ThrowOnError extends boolean = false>(options?: Options<ReadinessData, ThrowOnError>) => (options?.client ?? client).get<ReadinessResponses, ReadinessErrors, ThrowOnError>({ url: '/health/readiness', ...options });
 
