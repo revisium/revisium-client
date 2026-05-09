@@ -204,8 +204,11 @@ export class RevisiumClient {
 
   private setBearerToken(token: string): void {
     this.clearApiKeyQueryInterceptor();
+    // The generated SDK now declares both apiKey and bearer schemes per
+    // operation. Returning the token only for the bearer scheme keeps the
+    // JWT out of the X-Api-Key header (which the server validates as a key).
     this._client.setConfig({
-      auth: token,
+      auth: ({ scheme }) => (scheme === 'bearer' ? token : undefined),
       headers: { 'X-Api-Key': null, Authorization: null },
     });
     this._isAuthenticated = true;

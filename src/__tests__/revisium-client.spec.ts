@@ -59,11 +59,16 @@ describe('RevisiumClient', () => {
     expect(client.isAuthenticated()).toBe(true);
   });
 
-  it('loginWithToken sets auth config for Bearer header', () => {
+  it('loginWithToken routes JWT to bearer scheme only', async () => {
     const client = new RevisiumClient({ baseUrl: 'http://localhost:8080' });
     client.loginWithToken('jwt-token-123');
     const config = client.client.getConfig();
-    expect(config.auth).toBe('jwt-token-123');
+    expect(typeof config.auth).toBe('function');
+    const authFn = config.auth as (auth: {
+      scheme?: string;
+    }) => string | undefined | Promise<string | undefined>;
+    expect(await authFn({ scheme: 'bearer' })).toBe('jwt-token-123');
+    expect(await authFn({ scheme: 'apiKey' })).toBeUndefined();
   });
 
   describe('loginWithApiKey', () => {
@@ -94,7 +99,7 @@ describe('RevisiumClient', () => {
       client.loginWithApiKey(VALID_API_KEY);
       client.loginWithToken('jwt-token-123');
       const config = client.client.getConfig();
-      expect(config.auth).toBe('jwt-token-123');
+      expect(typeof config.auth).toBe('function');
       expect((config.headers as Headers).get('X-Api-Key')).toBeNull();
     });
 
