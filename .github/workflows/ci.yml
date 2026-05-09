@@ -37,7 +37,7 @@ jobs:
 
       - name: Start Revisium
         run: |
-          npx @revisium/standalone --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
+          npx @revisium/standalone@2.6.0 --auth --port 9000 --data .revisium-test > revisium.log 2>&1 &
           echo $! > revisium.pid
           echo "Started with PID $(cat revisium.pid)"
 
