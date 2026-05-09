@@ -15,8 +15,8 @@ jobs:
       node_version: 24.11.1
       install_command: npm ci
       pre_publish_commands: |
-        npm run build
         npm run tsc
+        npm run build
       npm_access: public
       publish_auth: token
       create_github_release: true
