@@ -98,9 +98,6 @@ const user = await client.me(); // { id, username, email, hasPassword }
 
 ### API Key Management
 
-API key management is exposed through the System GraphQL API because those
-operations are not part of the REST OpenAPI spec.
-
 ```typescript
 await client.login('admin', 'admin');
 
@@ -433,17 +430,17 @@ const myClient = createClient(createConfig({
 
 ### API Keys
 
-High-level API key management methods use GraphQL:
+High-level API key management methods call generated REST endpoints:
 
-| Method | Description |
-|--------|-------------|
-| `createPersonalApiKey` | Create a personal key for the current user |
-| `createServiceApiKey` | Create an organization service key |
-| `getMyApiKeys` | List the current user's personal keys |
-| `getServiceApiKeys` | List service keys for an organization |
-| `getApiKeyById` | Read key metadata by ID |
-| `rotateApiKey` | Rotate a key and return the new secret |
-| `revokeApiKey` | Revoke a key |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `createPersonalApiKey` | `POST /api/api-keys/personal` | Create a personal key for the current user |
+| `getMyApiKeys` | `GET /api/api-keys/personal` | List the current user's personal keys |
+| `getApiKeyById` | `GET /api/api-keys/{id}` | Read key metadata by ID |
+| `rotateApiKey` | `POST /api/api-keys/{id}/rotate` | Rotate a key and return the new secret |
+| `revokeApiKey` | `POST /api/api-keys/{id}/revoke` | Revoke a key |
+| `createServiceApiKey` | `POST /api/organization/{organizationId}/api-keys/service` | Create an organization service key |
+| `getServiceApiKeys` | `GET /api/organization/{organizationId}/api-keys/service` | List service keys for an organization |
 
 ### Projects
 

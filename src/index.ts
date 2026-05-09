@@ -17,9 +17,7 @@ export type {
   ApiKeyWithSecret,
   BaseApiKeyScopeInput,
   CaslPermissions,
-  CaslPermissionsInput,
   CaslRule,
-  CaslRuleInput,
   CreatePersonalApiKeyInput,
   CreateServiceApiKeyInput,
 } from './api-keys.js';

@@ -3,8 +3,8 @@
 ## Project
 
 `@revisium/client` is the TypeScript client for the Revisium System REST API,
-with a small hand-written layer for higher-level scopes and GraphQL-only
-operations such as API key management.
+with a small hand-written layer for higher-level scopes (organization /
+branch / revision wrappers).
 
 ## Local Workflow
 
@@ -22,8 +22,9 @@ operations such as API key management.
 - Shared REST wrappers live in `src/data-operations.ts`.
 - API key auth and types live in `src/api-keys.ts`; keep validation aligned with
   core's `rev_` plus 22 base64url-character format.
-- API key management methods in `RevisiumClient` call the System GraphQL API
-  because those operations are not in the REST OpenAPI spec.
+- API key management methods in `RevisiumClient` call generated REST endpoints
+  under `/api/api-keys/*` and `/api/organization/{organizationId}/api-keys/*`.
+- To refresh the spec from cloud.dev: `npm run generate:download`.
 
 ## Release Hygiene
 

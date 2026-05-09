@@ -186,12 +186,10 @@ describe('RevisiumClient', () => {
   });
 
   describe('API key management', () => {
-    it('creates a personal API key over GraphQL', async () => {
-      const fetchMock = graphqlFetch({
-        createPersonalApiKey: {
-          secret: VALID_API_KEY,
-          apiKey: createApiKeyModel(),
-        },
+    it('creates a personal API key over REST', async () => {
+      const fetchMock = restFetch({
+        body: { secret: VALID_API_KEY, apiKey: createApiKeyModel() },
+        status: 201,
       });
       const client = new RevisiumClient({
         baseUrl: 'http://localhost:8080',
@@ -209,34 +207,53 @@ describe('RevisiumClient', () => {
 
       expect(result.secret).toBe(VALID_API_KEY);
       expect(result.apiKey.readOnly).toBe(true);
+      expect(fetchMock.lastRequest?.method).toBe('POST');
+      expect(fetchMock.lastRequest?.url).toBe(
+        'http://localhost:8080/api/api-keys/personal',
+      );
       expect(fetchMock.lastRequest?.headers.get('Authorization')).toBe(
         'Bearer jwt-token-123',
       );
-      expect(fetchMock.lastBody?.query).toContain('createPersonalApiKey');
-      expect(fetchMock.lastBody?.variables).toEqual({
-        data: {
-          name: 'CI/CD',
-          organizationId: 'admin',
-          projectIds: ['project-1'],
-          branchNames: ['master'],
-          readOnly: true,
-        },
+      expect(await fetchMock.lastBody).toEqual({
+        name: 'CI/CD',
+        organizationId: 'admin',
+        projectIds: ['project-1'],
+        branchNames: ['master'],
+        readOnly: true,
       });
     });
 
-    it('creates a service API key over GraphQL', async () => {
+    it('serializes Date expiresAt to ISO string', async () => {
+      const fetchMock = restFetch({
+        body: { secret: VALID_API_KEY, apiKey: createApiKeyModel() },
+        status: 201,
+      });
+      const client = new RevisiumClient({
+        baseUrl: 'http://localhost:8080',
+        fetch: fetchMock.fetch,
+      });
+      client.loginWithToken('jwt-token-123');
+
+      await client.createPersonalApiKey({
+        name: 'CI/CD',
+        expiresAt: new Date('2026-12-31T00:00:00.000Z'),
+      });
+
+      expect(await fetchMock.lastBody).toEqual({
+        name: 'CI/CD',
+        expiresAt: '2026-12-31T00:00:00.000Z',
+      });
+    });
+
+    it('creates a service API key over REST scoped by organizationId path', async () => {
       const serviceKey = {
         ...createApiKeyModel(),
-        permissions: {
-          rules: [{ action: ['read'], subject: ['Row'] }],
-        },
+        permissions: { rules: [{ action: ['read'], subject: ['Row'] }] },
         type: 'SERVICE' as const,
       };
-      const fetchMock = graphqlFetch({
-        createServiceApiKey: {
-          secret: VALID_API_KEY,
-          apiKey: serviceKey,
-        },
+      const fetchMock = restFetch({
+        body: { secret: VALID_API_KEY, apiKey: serviceKey },
+        status: 201,
       });
       const client = new RevisiumClient({
         baseUrl: 'http://localhost:8080',
@@ -247,21 +264,25 @@ describe('RevisiumClient', () => {
       const result = await client.createServiceApiKey({
         name: 'Endpoint worker',
         organizationId: 'admin',
-        permissions: {
-          rules: [{ action: ['read'], subject: ['Row'] }],
-        },
+        permissions: { rules: [{ action: ['read'], subject: ['Row'] }] },
       });
 
       expect(result.apiKey.type).toBe('SERVICE');
       expect(result.apiKey.permissions?.rules[0]?.action).toEqual(['read']);
+      expect(fetchMock.lastRequest?.url).toBe(
+        'http://localhost:8080/api/organization/admin/api-keys/service',
+      );
       expect(fetchMock.lastRequest?.headers.get('X-Api-Key')).toBe(
         VALID_API_KEY,
       );
-      expect(fetchMock.lastBody?.query).toContain('createServiceApiKey');
+      expect(await fetchMock.lastBody).toEqual({
+        name: 'Endpoint worker',
+        permissions: { rules: [{ action: ['read'], subject: ['Row'] }] },
+      });
     });
 
-    it('preserves a path prefix in GraphQL URLs', async () => {
-      const fetchMock = graphqlFetch({ myApiKeys: [] });
+    it('appends api_key query parameter on REST calls', async () => {
+      const fetchMock = restFetch({ body: [], status: 200 });
       const client = new RevisiumClient({
         baseUrl: 'https://example.com/revisium',
         fetch: fetchMock.fetch,
@@ -271,54 +292,21 @@ describe('RevisiumClient', () => {
       await client.getMyApiKeys();
 
       expect(fetchMock.lastRequest?.url).toBe(
-        `https://example.com/revisium/graphql?api_key=${VALID_API_KEY}`,
+        `https://example.com/revisium/api/api-keys/personal?api_key=${VALID_API_KEY}`,
       );
     });
 
-    it('preserves custom Headers config for GraphQL requests', async () => {
-      const fetchMock = graphqlFetch({ myApiKeys: [] });
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock.fetch,
-      });
-      client.loginWithToken('jwt-token-123');
-      client.client.setConfig({
-        headers: new Headers([['X-Trace-Id', 'trace-1']]),
-      });
-
-      await client.getMyApiKeys();
-
-      expect(fetchMock.lastRequest?.headers.get('Authorization')).toBe(
-        'Bearer jwt-token-123',
-      );
-      expect(fetchMock.lastRequest?.headers.get('X-Trace-Id')).toBe('trace-1');
-    });
-
-    it('uses an auth callback for GraphQL bearer headers', async () => {
-      const fetchMock = graphqlFetch({ myApiKeys: [] });
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock.fetch,
-      });
-      client.client.setConfig({
-        auth: () => 'callback-token',
-      });
-
-      await client.getMyApiKeys();
-
-      expect(fetchMock.lastRequest?.headers.get('Authorization')).toBe(
-        'Bearer callback-token',
-      );
-    });
-
-    it('lists, reads, revokes, and rotates API keys over GraphQL', async () => {
+    it('lists, reads, revokes, and rotates API keys over REST', async () => {
       const key = createApiKeyModel();
-      const fetchMock = graphqlFetchQueue([
-        { myApiKeys: [key] },
-        { serviceApiKeys: [{ ...key, type: 'SERVICE' as const }] },
-        { apiKeyById: key },
-        { revokeApiKey: { ...key, revokedAt: '2026-05-09T01:00:00.000Z' } },
-        { rotateApiKey: { secret: VALID_API_KEY, apiKey: key } },
+      const fetchMock = restFetchQueue([
+        { body: [key], status: 200 },
+        { body: [{ ...key, type: 'SERVICE' as const }], status: 200 },
+        { body: key, status: 200 },
+        {
+          body: { ...key, revokedAt: '2026-05-09T01:00:00.000Z' },
+          status: 200,
+        },
+        { body: { secret: VALID_API_KEY, apiKey: key }, status: 201 },
       ]);
       const client = new RevisiumClient({
         baseUrl: 'http://localhost:8080',
@@ -327,38 +315,44 @@ describe('RevisiumClient', () => {
       client.loginWithToken('jwt-token-123');
 
       await expect(client.getMyApiKeys()).resolves.toHaveLength(1);
+      expect(fetchMock.requests[0]?.method).toBe('GET');
+      expect(fetchMock.requests[0]?.url).toBe(
+        'http://localhost:8080/api/api-keys/personal',
+      );
+
       await expect(client.getServiceApiKeys('admin')).resolves.toHaveLength(1);
+      expect(fetchMock.requests[1]?.url).toBe(
+        'http://localhost:8080/api/organization/admin/api-keys/service',
+      );
+
       await expect(client.getApiKeyById('key-1')).resolves.toEqual(key);
+      expect(fetchMock.requests[2]?.url).toBe(
+        'http://localhost:8080/api/api-keys/key-1',
+      );
+
       await expect(client.revokeApiKey('key-1')).resolves.toMatchObject({
         revokedAt: '2026-05-09T01:00:00.000Z',
       });
+      expect(fetchMock.requests[3]?.method).toBe('POST');
+      expect(fetchMock.requests[3]?.url).toBe(
+        'http://localhost:8080/api/api-keys/key-1/revoke',
+      );
+
       await expect(client.rotateApiKey('key-1')).resolves.toMatchObject({
         secret: VALID_API_KEY,
       });
+      expect(fetchMock.requests[4]?.method).toBe('POST');
+      expect(fetchMock.requests[4]?.url).toBe(
+        'http://localhost:8080/api/api-keys/key-1/rotate',
+      );
     });
 
-    it('throws GraphQL errors', async () => {
+    it('throws on REST error responses', async () => {
       const fetchMock: typeof fetch = () =>
         Promise.resolve(
-          new Response(
-            JSON.stringify({ errors: [{ message: 'Permission denied' }] }),
-            { headers: { 'Content-Type': 'application/json' }, status: 200 },
-          ),
-        );
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock,
-      });
-
-      await expect(client.getMyApiKeys()).rejects.toThrow('Permission denied');
-    });
-
-    it('throws when GraphQL data is missing', async () => {
-      const fetchMock: typeof fetch = () =>
-        Promise.resolve(
-          new Response(JSON.stringify({}), {
+          new Response(JSON.stringify({ message: 'Permission denied' }), {
             headers: { 'Content-Type': 'application/json' },
-            status: 200,
+            status: 403,
           }),
         );
       const client = new RevisiumClient({
@@ -366,82 +360,7 @@ describe('RevisiumClient', () => {
         fetch: fetchMock,
       });
 
-      await expect(client.getMyApiKeys()).rejects.toThrow(
-        'GraphQL response did not include data.',
-      );
-    });
-
-    it('throws non-OK GraphQL HTTP errors', async () => {
-      const fetchMock: typeof fetch = () =>
-        Promise.resolve(
-          new Response(
-            JSON.stringify({
-              message: ['Forbidden', 'Missing manage-api-key'],
-            }),
-            { headers: { 'Content-Type': 'application/json' }, status: 403 },
-          ),
-        );
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock,
-      });
-
-      await expect(client.getServiceApiKeys('admin')).rejects.toThrow(
-        'Forbidden; Missing manage-api-key',
-      );
-    });
-
-    it('throws plain-text non-OK GraphQL HTTP errors', async () => {
-      const fetchMock: typeof fetch = () =>
-        Promise.resolve(new Response('upstream unavailable', { status: 503 }));
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock,
-      });
-
-      await expect(client.getMyApiKeys()).rejects.toThrow(
-        'upstream unavailable',
-      );
-    });
-
-    it('falls back to HTTP status for empty non-OK GraphQL responses', async () => {
-      const fetchMock: typeof fetch = () =>
-        Promise.resolve(new Response('', { status: 502 }));
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock,
-      });
-
-      await expect(client.getMyApiKeys()).rejects.toThrow('HTTP 502');
-    });
-
-    it('formats scalar and object GraphQL HTTP error messages', async () => {
-      const responses = [
-        new Response(JSON.stringify({ message: null }), { status: 401 }),
-        new Response(JSON.stringify({ message: false }), { status: 400 }),
-        new Response(JSON.stringify({ message: { code: 'BAD_REQUEST' } }), {
-          status: 400,
-        }),
-      ];
-      let index = 0;
-      const fetchMock: typeof fetch = () => {
-        const next = responses[index];
-        if (!next) {
-          throw new Error('Unexpected fetch call');
-        }
-        index += 1;
-        return Promise.resolve(next);
-      };
-      const client = new RevisiumClient({
-        baseUrl: 'http://localhost:8080',
-        fetch: fetchMock,
-      });
-
-      await expect(client.getMyApiKeys()).rejects.toThrow('HTTP 401');
-      await expect(client.getMyApiKeys()).rejects.toThrow('false');
-      await expect(client.getMyApiKeys()).rejects.toThrow(
-        '{"code":"BAD_REQUEST"}',
-      );
+      await expect(client.getMyApiKeys()).rejects.toThrow('Permission denied');
     });
   });
 
@@ -458,56 +377,67 @@ describe('RevisiumClient', () => {
   });
 });
 
-function graphqlFetch(data: unknown) {
+interface RestResponse {
+  body: unknown;
+  status: number;
+}
+
+function restFetch(response: RestResponse) {
   let lastRequest: Request | undefined;
-  let lastBody:
-    | { query?: string; variables?: Record<string, unknown> }
-    | undefined;
+  let lastBodyPromise: Promise<unknown> | undefined;
 
   const fetchMock: typeof fetch = (input, init) => {
-    lastRequest = new Request(input, init);
-    lastBody = JSON.parse(getStringBody(init?.body)) as {
-      query?: string;
-      variables?: Record<string, unknown>;
-    };
+    const request = input instanceof Request ? input : new Request(input, init);
+    lastRequest = request;
+    lastBodyPromise = readJsonBody(request, init);
     return Promise.resolve(
-      new Response(JSON.stringify({ data }), {
+      new Response(JSON.stringify(response.body), {
         headers: { 'Content-Type': 'application/json' },
-        status: 200,
+        status: response.status,
       }),
     );
   };
 
   return {
     fetch: fetchMock,
-    get lastBody() {
-      return lastBody;
-    },
     get lastRequest() {
       return lastRequest;
+    },
+    get lastBody() {
+      return lastBodyPromise;
     },
   };
 }
 
-function graphqlFetchQueue(data: unknown[]) {
+async function readJsonBody(
+  request: Request,
+  init: RequestInit | undefined,
+): Promise<unknown> {
+  if (typeof init?.body === 'string' && init.body) {
+    return JSON.parse(init.body);
+  }
+  const text = await request.clone().text();
+  return text ? JSON.parse(text) : undefined;
+}
+
+function restFetchQueue(responses: RestResponse[]) {
+  const requests: Request[] = [];
   let index = 0;
-  const fetchMock: typeof fetch = () => {
-    const next = data[index];
+  const fetchMock: typeof fetch = (input, init) => {
+    const request = input instanceof Request ? input : new Request(input, init);
+    requests.push(request);
+    const next = responses[index];
     index += 1;
+    if (!next) {
+      throw new Error('Unexpected fetch call');
+    }
     return Promise.resolve(
-      new Response(JSON.stringify({ data: next }), {
+      new Response(JSON.stringify(next.body), {
         headers: { 'Content-Type': 'application/json' },
-        status: 200,
+        status: next.status,
       }),
     );
   };
 
-  return { fetch: fetchMock };
-}
-
-function getStringBody(body: BodyInit | null | undefined): string {
-  if (typeof body !== 'string') {
-    throw new Error('Expected string request body');
-  }
-  return body;
+  return { fetch: fetchMock, requests };
 }

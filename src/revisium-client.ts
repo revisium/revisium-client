@@ -14,6 +14,8 @@ import {
   type ApiKeyWithSecret,
   type CreatePersonalApiKeyInput,
   type CreateServiceApiKeyInput,
+  toCreatePersonalApiKeyDto,
+  toCreateServiceApiKeyDto,
 } from './api-keys.js';
 import * as ops from './data-operations.js';
 import { OrgScope } from './org-scope.js';
@@ -39,11 +41,6 @@ export class RevisiumClient {
   private readonly _client: Client;
   private readonly _baseUrl: string;
   private _isAuthenticated = false;
-  private _apiKeyAuth?: {
-    key: string;
-    transport: ApiKeyTransport;
-    queryParamName: string;
-  };
   private _apiKeyQueryInterceptorId?: number;
 
   constructor(options: RevisiumClientOptions) {
@@ -81,7 +78,7 @@ export class RevisiumClient {
 
   loginWithApiKey(key: string, options: ApiKeyAuthOptions = {}): void {
     assertValidApiKey(key);
-    const transport = options.transport ?? 'header';
+    const transport: ApiKeyTransport = options.transport ?? 'header';
 
     if (transport === 'query' && options.queryParamName === '') {
       throw new Error('API key query parameter name must not be empty.');
@@ -90,7 +87,6 @@ export class RevisiumClient {
     const queryParamName = options.queryParamName ?? 'api_key';
 
     this.clearApiKeyQueryInterceptor();
-    this._apiKeyAuth = { key, transport, queryParamName };
 
     if (transport === 'header') {
       this._client.setConfig({
@@ -122,87 +118,63 @@ export class RevisiumClient {
   async createPersonalApiKey(
     data: CreatePersonalApiKeyInput,
   ): Promise<ApiKeyWithSecret> {
-    const result = await this.graphql<{
-      createPersonalApiKey: ApiKeyWithSecret;
-    }>(
-      `mutation CreatePersonalApiKey($data: CreatePersonalApiKeyInput!) {
-        createPersonalApiKey(data: $data) {
-          secret
-          apiKey { ${API_KEY_FIELDS} }
-        }
-      }`,
-      { data },
+    const result = ops.unwrap(
+      await sdk.createPersonalApiKey({
+        client: this._client,
+        body: toCreatePersonalApiKeyDto(data),
+      }),
     );
-    return result.createPersonalApiKey;
+    return result as unknown as ApiKeyWithSecret;
   }
 
   async createServiceApiKey(
     data: CreateServiceApiKeyInput,
   ): Promise<ApiKeyWithSecret> {
-    const result = await this.graphql<{
-      createServiceApiKey: ApiKeyWithSecret;
-    }>(
-      `mutation CreateServiceApiKey($data: CreateServiceApiKeyInput!) {
-        createServiceApiKey(data: $data) {
-          secret
-          apiKey { ${API_KEY_FIELDS} }
-        }
-      }`,
-      { data },
+    const { organizationId, ...body } = data;
+    const result = ops.unwrap(
+      await sdk.createServiceApiKey({
+        client: this._client,
+        path: { organizationId },
+        body: toCreateServiceApiKeyDto(body),
+      }),
     );
-    return result.createServiceApiKey;
+    return result as unknown as ApiKeyWithSecret;
   }
 
   async rotateApiKey(id: string): Promise<ApiKeyWithSecret> {
-    const result = await this.graphql<{ rotateApiKey: ApiKeyWithSecret }>(
-      `mutation RotateApiKey($id: ID!) {
-        rotateApiKey(id: $id) {
-          secret
-          apiKey { ${API_KEY_FIELDS} }
-        }
-      }`,
-      { id },
+    const result = ops.unwrap(
+      await sdk.rotateApiKey({ client: this._client, path: { id } }),
     );
-    return result.rotateApiKey;
+    return result as unknown as ApiKeyWithSecret;
   }
 
   async revokeApiKey(id: string): Promise<ApiKeyModel> {
-    const result = await this.graphql<{ revokeApiKey: ApiKeyModel }>(
-      `mutation RevokeApiKey($id: ID!) {
-        revokeApiKey(id: $id) { ${API_KEY_FIELDS} }
-      }`,
-      { id },
+    const result = ops.unwrap(
+      await sdk.revokeApiKey({ client: this._client, path: { id } }),
     );
-    return result.revokeApiKey;
+    return result as unknown as ApiKeyModel;
   }
 
   async getMyApiKeys(): Promise<ApiKeyModel[]> {
-    const result = await this.graphql<{ myApiKeys: ApiKeyModel[] }>(
-      `query MyApiKeys {
-        myApiKeys { ${API_KEY_FIELDS} }
-      }`,
-    );
-    return result.myApiKeys;
+    const result = ops.unwrap(await sdk.myApiKeys({ client: this._client }));
+    return result as unknown as ApiKeyModel[];
   }
 
   async getServiceApiKeys(organizationId: string): Promise<ApiKeyModel[]> {
-    const result = await this.graphql<{ serviceApiKeys: ApiKeyModel[] }>(
-      `query ServiceApiKeys($organizationId: String!) {
-        serviceApiKeys(organizationId: $organizationId) { ${API_KEY_FIELDS} }
-      }`,
-      { organizationId },
+    const result = ops.unwrap(
+      await sdk.serviceApiKeys({
+        client: this._client,
+        path: { organizationId },
+      }),
     );
-    return result.serviceApiKeys;
+    return result as unknown as ApiKeyModel[];
   }
 
   async getApiKeyById(id: string): Promise<ApiKeyModel> {
-    const result = await this.graphql<{ apiKeyById: ApiKeyModel }>(
-      `query ApiKeyById($id: ID!) {
-        apiKeyById(id: $id) { ${API_KEY_FIELDS} }
-      }`,
-      { id },
+    const result = ops.unwrap(
+      await sdk.apiKeyById({ client: this._client, path: { id } }),
     );
-    return result.apiKeyById;
+    return result as unknown as ApiKeyModel;
   }
 
   org(organizationId: string): OrgScope {
@@ -232,7 +204,6 @@ export class RevisiumClient {
 
   private setBearerToken(token: string): void {
     this.clearApiKeyQueryInterceptor();
-    this._apiKeyAuth = undefined;
     this._client.setConfig({
       auth: token,
       headers: { 'X-Api-Key': null, Authorization: null },
@@ -246,121 +217,4 @@ export class RevisiumClient {
       this._apiKeyQueryInterceptorId = undefined;
     }
   }
-
-  private async graphql<TData>(
-    query: string,
-    variables?: Record<string, unknown>,
-  ): Promise<TData> {
-    const url = new URL('graphql', `${this._baseUrl}/`);
-    if (this._apiKeyAuth?.transport === 'query') {
-      url.searchParams.set(
-        this._apiKeyAuth.queryParamName,
-        this._apiKeyAuth.key,
-      );
-    }
-
-    const config = this._client.getConfig();
-    const response = await (config.fetch ?? globalThis.fetch)(url, {
-      body: JSON.stringify({ query, variables }),
-      credentials: config.credentials,
-      headers: await this.createGraphqlHeaders(),
-      method: 'POST',
-      signal: config.signal,
-    });
-
-    const payload = await this.parseGraphqlResponse<TData>(response);
-    if (payload.errors?.length) {
-      throw new Error(payload.errors.map((error) => error.message).join('; '));
-    }
-    if (payload.data === undefined) {
-      throw new Error('GraphQL response did not include data.');
-    }
-    return payload.data;
-  }
-
-  private async createGraphqlHeaders(): Promise<Headers> {
-    const config = this._client.getConfig();
-    const headers = new Headers(config.headers as HeadersInit | undefined);
-    headers.set('Content-Type', 'application/json');
-
-    if (!headers.has('Authorization') && config.auth) {
-      const token =
-        typeof config.auth === 'function'
-          ? await config.auth({ scheme: 'bearer', type: 'http' })
-          : config.auth;
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-    }
-
-    return headers;
-  }
-
-  private async parseGraphqlResponse<TData>(
-    response: Response,
-  ): Promise<GraphqlResponse<TData>> {
-    const text = await response.text();
-    let payload: unknown;
-
-    try {
-      payload = text ? JSON.parse(text) : {};
-    } catch {
-      payload = text;
-    }
-
-    if (!response.ok) {
-      throw new Error(this.formatHttpError(response.status, payload));
-    }
-
-    return payload as GraphqlResponse<TData>;
-  }
-
-  private formatHttpError(status: number, payload: unknown): string {
-    if (typeof payload === 'object' && payload && 'message' in payload) {
-      const { message } = payload;
-      return Array.isArray(message)
-        ? message.map((item) => this.stringifyErrorMessage(item)).join('; ')
-        : this.stringifyErrorMessage(message, status);
-    }
-    if (typeof payload === 'string' && payload) {
-      return payload;
-    }
-    return `HTTP ${status}`;
-  }
-
-  private stringifyErrorMessage(message: unknown, status?: number): string {
-    if (message === null || message === undefined) {
-      return status === undefined ? '' : `HTTP ${status}`;
-    }
-    if (typeof message === 'string') {
-      return message;
-    }
-    if (typeof message === 'number' || typeof message === 'boolean') {
-      return String(message);
-    }
-    return JSON.stringify(message) ?? '';
-  }
-}
-
-const API_KEY_FIELDS = `
-  id
-  prefix
-  type
-  name
-  organizationId
-  projectIds
-  branchNames
-  tableIds
-  readOnly
-  allowedIps
-  permissions
-  expiresAt
-  lastUsedAt
-  createdAt
-  revokedAt
-`;
-
-interface GraphqlResponse<TData> {
-  data?: TData;
-  errors?: Array<{ message: string }>;
 }
